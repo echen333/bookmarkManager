@@ -35,10 +35,9 @@ class Item(models.Model):
     title = models.CharField(max_length=200)
     depth = models.IntegerField()
     par_id = models.IntegerField()
-    my_id = models.IntegerField()
     # child_id = ArrayField(models.IntegerField())
     type = models.CharField(max_length=200)
     link = models.CharField(max_length=200)
     def __str__(self):
-        return self.title+" "+str(self.my_id)
+        return self.title+" "+str(self.id)
     
