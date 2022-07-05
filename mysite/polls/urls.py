@@ -14,4 +14,5 @@ urlpatterns = [
     path('addLink/', views.addLink, name='addLink'),
     path('addFolder/', views.addFolder, name='addFolder'),
     path('<int:my_id>/deletes/', views.deletes, name='deletes'),
+    path('<int:my_id>/getBookmark/', views.getBookmark, name='getBookmark'),
 ]

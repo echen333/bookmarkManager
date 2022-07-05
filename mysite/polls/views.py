@@ -16,6 +16,8 @@ from django.http import JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
+from django.core import serializers
+
 def index(request):
     # return HttpResponse("Hello, world. You're at the polls index.")
     
@@ -32,6 +34,29 @@ def index(request):
     # context = {'latest_question_list': latest_question_list}
     # return render(request, 'polls/index.html', context)
 
+#TODO: getChildrenBookmark
+# loop through children and only return type, id, link,
+#TODO: getAllBookmarks
+# return all objects to populate sidebar
+@csrf_exempt
+def getBookmark(request, my_id):
+    #TODO NOT SERIALIZABLE, JSON RESPONSE?
+    item = Item.objects.get(pk=my_id)
+    print(item)
+    print(item.id)
+    id = item.id
+    serialized_obj = serializers.serialize('json', [ item, ])
+    print(serialized_obj)
+    return JsonResponse({
+        "title" : {serialized_obj.title},                 
+        # "my_id" : {item.id},           
+        # "depth" : {item.depth},                 
+        # "link" : {item.link},                 
+        # "type" : {item.type},                 
+        # "par_id" : {item.par_id},                 
+        # "child_id" : {item.child_id},                 
+        })
+    
 @csrf_exempt
 def addLink(request):
     # add new Item
@@ -43,6 +68,16 @@ def addLink(request):
         depth="1" #HERE
     )
     par = Item.objects.get(pk=request.POST['par_id']);
+    # tmp = ","+str(newLink.id)
+    tmp = par.child_id;
+    tmp = tmp+","+str(newLink.id)
+    print(tmp)
+    par.child_id=tmp
+    par.save()
+    print(par)
+    print("HI",par.child_id)
+    print(tmp)
+    
     # how ^ ??
     # TODO: children add id
     return HttpResponse("Success");
@@ -56,7 +91,11 @@ def addFolder(request):
         type="Folder",
         depth="1" #HERE
     )
-    par = Item.objects.get(pk=request.POST['par_id']);
+    par = Item.objects.get(pk=request.POST['par_id'])
+    tmp = par.child_id+","+str(newFolder.id)
+    par.child_id = tmp
+    par.save()
+    
     print(Item.objects.all());
     # TODO: par add child id
     return HttpResponse("Success");
@@ -67,8 +106,10 @@ def deletes(request, my_id):
     if (item.type=="Link") :
         item.delete()
     else :
+        #TODO: UNTESTED
         print("is folder")
-        #recursive delete thru children
+        for x in item.child_id.split(','):
+            deletes(request, x)
     print(Item.objects.all())
     return HttpResponse("Success");
 

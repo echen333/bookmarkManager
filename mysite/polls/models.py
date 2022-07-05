@@ -35,7 +35,7 @@ class Item(models.Model):
     title = models.CharField(max_length=200)
     depth = models.IntegerField()
     par_id = models.IntegerField()
-    # child_id = ArrayField(models.IntegerField())
+    child_id = models.CharField(max_length=300, default="", blank=True)
     type = models.CharField(max_length=200)
     link = models.CharField(max_length=200)
     def __str__(self):
