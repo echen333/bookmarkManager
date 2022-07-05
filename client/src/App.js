@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 import classNames from 'classnames';
+import axios from 'axios'
 
 /*
 proprties of a file
@@ -46,9 +47,10 @@ function App() {
 }
 
 function NavBar({optionsOpen, setOptionsOpen}) {
-  const optionsClicked = () => {
-    setOptionsOpen(!optionsOpen);
-
+  const optionsClicked = async() => {
+    const ret = await axios.get('http://localhost:8000')
+    console.log(ret);
+    // setOptionsOpen(!optionsOpen);
   }
   const optionsFocusedOut = (e) => {
     console.log("OUT");
