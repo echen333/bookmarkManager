@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+#could use a viewset
+
 urlpatterns = [
     path('', views.index, name='index'),
     # ex: /polls/5/
