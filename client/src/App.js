@@ -42,9 +42,10 @@ function App() {
 
 function NavBar({optionsOpen, setOptionsOpen}) {
   const optionsClicked = async() => {
-    const ret = await axios.get('http://localhost:8000')
+    const ret = await axios.get('/polls/1/getBookmark')
     console.log(ret);
-    // setOptionsOpen(!optionsOpen);
+    console.log("HI");
+    setOptionsOpen(!optionsOpen);
   }
   const optionsFocusedOut = (e) => {
     console.log("OUT");
