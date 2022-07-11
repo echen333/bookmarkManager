@@ -9,7 +9,7 @@ import axios from 'axios'
 
 /*
 properties of a file
- - names/title
+ - title
  - depth
  - par_id
  - id
@@ -20,31 +20,153 @@ properties of a file
 
 function App() {
 
-  const [files, setFiles] = useState([
-    {names:"root", depth:"pl-0", par_id:0, id:1, child_id:[2,3], type:"Folder"}, 
-    {names:"test", depth:"pl-5", par_id:1, id:2, child_id:[],  type:"Link"},
-    {names:"math", depth:"pl-5", par_id:1, id:3, child_id:[],  type:"Link"}]);
+  const [files, setFiles] = useState([]);
   const [curId, setCurID] = useState(1);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [linkPopupOpen, setLinkPopupOpen] = useState(false);
+  const [folderPopupOpen, setFolderPopupOpen] = useState(false);
+
+  useEffect( () => {
+    async function fetchAll() {
+      const ret = await axios.get('/polls/getAll');
+      console.log(ret);
+      setFiles(ret.data)
+    }
+    fetchAll();
+
+  }, [])
 
   return (
     <div>
-      <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen}/>
+      <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}/>
+      
+      {
+        folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}/>
+      }
+      {
+        linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}/>
+      }
 
       <SideBar files={files} curId={curId} setCurID={setCurID}/>
       
+      <div className="inline-block ml-36 mr-10 max-w-screen-lg w-screen shadow-2xl">
+        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID}/>
+      </div>
 
-      <Viewport content={files.find( x => x.id === curId)} files={files}/>
+
       
     </div>
   );
 }
 
-function NavBar({optionsOpen, setOptionsOpen}) {
+function FolderPopup({setFolderPopupOpen, curId, setFiles, files}) {
+    
+  const [formName, setFormName] = useState("");
+
+  const SaveButton = async () => {
+    setFolderPopupOpen(false);
+    var bodyFormData = new FormData();
+    bodyFormData.append('title', formName);
+    bodyFormData.append('par_id', curId);
+    for (var key of bodyFormData.entries()) {
+      console.log(key[0] + ', ' + key[1]);
+    }
+    const ret = await axios.post('/polls/addFolder/', bodyFormData);
+    // TODO: setFiles( files => [...files, obj])
+    // console.log(files, obj);
+    console.log(ret);
+  }
+  const CancelButton = () => {
+    setFolderPopupOpen(false);
+  }
+  const nameChange = (e) => {
+    setFormName(e.target.value);
+  }
+  return (
+    <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
+      <div className="bg-white relative w-72 h-56 left-2/4 top-2/4 rounded-lg z-50">
+        <div className="ml-10 font-bold"> Add Folder
+        </div>
+        <div className="ml-10">
+          <div className="text-sm">
+            Name
+          </div>
+          <div>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formName} onChange={nameChange}></input>
+          </div>
+        </div>
+        <div className="absolute bottom-0 right-0">
+          <button onClick={CancelButton} className="bg-white border-gray-500 border-2 rounded-lg w-16 h-10 text-blue-600">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-500 rounded-lg w-16 h-10 mr-4 mb-4">Save</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+function LinkPopup({setLinkPopupOpen, curId, files}) {
+    
+  const [formName, setFormName] = useState("");
+  const [formURL, setFormURL] = useState("");
+
+  const SaveButton = async () => {
+    setLinkPopupOpen(false);
+    var bodyFormData = new FormData();
+    let tmp = formURL;
+    if(!formURL.includes("http")){
+      tmp = "http://"+formURL;
+      console.log(tmp);
+      setFormURL(tmp);
+    }
+    bodyFormData.append('link', tmp);
+    bodyFormData.append('title', formName);
+    bodyFormData.append('par_id', curId);
+    for (var key of bodyFormData.entries()) {
+      console.log(key[0] + ', ' + key[1]);
+    }
+    const ret = await axios.post('/polls/addLink/', bodyFormData);
+    console.log(ret);
+  }
+  const CancelButton = () => {
+    setLinkPopupOpen(false);
+  }
+  const nameChange = (e) => {
+    setFormName(e.target.value);
+  }
+  const URLChange = (e) => {
+    setFormURL(e.target.value);
+  }
+
+  return (
+    <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
+      <div className="bg-white relative w-72 h-56 left-2/4 top-2/4 rounded-lg z-50">
+        <div className="ml-10 font-bold"> Add Bookmark
+        </div>
+        <div className="ml-10">
+          <div className="text-sm">
+            Name
+          </div>
+          <div>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formName} onChange={nameChange}></input>
+          </div>
+        </div>
+        <div className="ml-10 text-sm">
+          URL
+          <div>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formURL} onChange={URLChange}></input>
+          </div>
+        </div>
+        <div className="absolute bottom-0 right-0">
+          <button onClick={CancelButton} className="bg-white border-gray-500 border-2 rounded-lg w-16 h-10 text-blue-600">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-500 rounded-lg w-16 h-10 mr-4 mb-4">Save</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOpen}) {
   const optionsClicked = async() => {
     const ret = await axios.get('/polls/1/getBookmark')
-    console.log(ret);
-    console.log("HI");
     setOptionsOpen(!optionsOpen);
   }
   const optionsFocusedOut = (e) => {
@@ -52,11 +174,13 @@ function NavBar({optionsOpen, setOptionsOpen}) {
     setOptionsOpen(false)
   }
   const newBookmark = () => {
-    //need POPUP
-    //setFiles, update to db
+    console.log("HEYAA");
+    setLinkPopupOpen(true);
+    setOptionsOpen(false);
   }
   const newFolder = () => {
-    //need POPUP
+    setFolderPopupOpen(true);
+    setOptionsOpen(false);
   }
 
   return (
@@ -89,7 +213,7 @@ function SideBar({files, curId, setCurID}) {
   return (
     <div className="fixed w-32 h-screen">
         {
-          files.map( (x,ind) => {
+          files.filter(x => x.type==="Folder").map( (x,ind) => {
             return <div className={classNames("hover:bg-gray-200 rounded-r-full",
               {
                 // TODO: should be taking from child if child hovered
@@ -128,39 +252,63 @@ function File({val, curId, setCurID}) {
             }
         
         <div className="pt-2 inline-block">
-          {val.names}
+          {val.title}
         </div>
       </div>
     </div>
   </div>
 }
 
-function Viewport({content,files}){
-  console.log(content);
+function Viewport({content,files, setCurID}){
+
+  const [focusedCard, setCardFocus] = useState(-1);
+
+  if(content === undefined){
+    return <div></div>
+  }
   //files search for id
-  return (
-    <div className="bg-red- inline-block ml-36 mr-10 max-w-screen-lg w-screen shadow-2xl">
-      {content.child_id.map( (x,ind) => {
-        const tmp = files.find(y => y.id===x);
-        return <Card key={ind} cardID={x} cardType="DOC" cardLink="TODO" cardName={tmp.names}/>
-      })}
-    </div>
-  )
+  let childArr = content.child_id.split(","); 
+
+  var Cards = [];
+  childArr.forEach( (ID, ind) => {
+    Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
+      setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
+  })
+
+  return Cards;
 }
 
-function Card({cardID,cardType,cardLink,cardName}){
-  return <div>
-    <img src={require('./img/folder.png')} className="h-5 w-5 inline-block"></img>
-    {/* {
-      cardType==="DOC" && "IS DOC"
-    } */}
-    {cardName}
-    {/* {cardType}
-    {cardLink} */}
-    <div className="h-8 w-8 mx-3 hover:bg-gray-300 rounded-full inline-block">
-      <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-2 right-3 relative mx-auto"/>
+function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
+
+  const handleClick = (e) => {
+    setCardFocus(parseInt(cardID));
+    if(e.detail>=2){
+      const itemSelected = files.find( x => parseInt(cardID) === x.id);
+      if (itemSelected && itemSelected.type==="Folder"){
+        setCurID(parseInt(cardID));
+      } else {
+        window.open(itemSelected.link)
+      }
+    }
+  }
+
+  let parsed = parseInt(cardID);
+  if(isNaN(parsed)){
+    return <div>
     </div>
-  </div>
+  }
+  let tmp = files.find( x => x.id === parsed)
+  
+  if(tmp === undefined){
+    console.log("AJKLSJDlkjasld");
+  } else {
+    return <div onClick={handleClick} className={classNames("cursor-pointer",
+      {
+        'bg-blue-200': parseInt(cardID) === focusedCard
+      })}>
+      {tmp.title}
+    </div>
+  }
 }
 
 export default App;
