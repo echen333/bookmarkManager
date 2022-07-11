@@ -4,6 +4,9 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse
 from django.http import Http404
+from urllib3 import HTTPResponse
+
+from .serializers import ItemSerializer
 
 from .models import Question, Item
 
@@ -18,6 +21,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.core import serializers
 
+from rest_framework.renderers import JSONRenderer
+
+@csrf_exempt
 def index(request):
     # return HttpResponse("Hello, world. You're at the polls index.")
     
@@ -38,24 +44,14 @@ def index(request):
 # loop through children and only return type, id, link,
 #TODO: getAllBookmarks
 # return all objects to populate sidebar
+
 @csrf_exempt
 def getBookmark(request, my_id):
-    #TODO NOT SERIALIZABLE, JSON RESPONSE?
     item = Item.objects.get(pk=my_id)
     print(item)
-    print(item.id)
-    id = item.id
-    serialized_obj = serializers.serialize('json', [ item, ])
-    print(serialized_obj)
-    return JsonResponse({
-        "title" : {serialized_obj.title},                 
-        # "my_id" : {item.id},           
-        # "depth" : {item.depth},                 
-        # "link" : {item.link},                 
-        # "type" : {item.type},                 
-        # "par_id" : {item.par_id},                 
-        # "child_id" : {item.child_id},                 
-        })
+    serialized_obj = ItemSerializer(item)
+    print(serialized_obj.data)
+    return JsonResponse(serialized_obj.data);
     
 @csrf_exempt
 def addLink(request):
