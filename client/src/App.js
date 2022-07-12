@@ -93,17 +93,17 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files}) {
       <div className="bg-white absolute w-[30rem] h-48 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
         <div className="ml-10 font-semibold mt-6 mb-3"> Add Folder
         </div>
-        <div className="ml-10 mb-8">
-          <div className="text-[10px] font-bold text-gray-700 mb-2">
+        <div className="ml-10 mb-8 focus-within:text-blue-500">
+          <div className="text-[10px] font-bold text-gray-700">
             Name
           </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formName} onChange={nameChange}></input>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
           </div>
         </div>
         <div className="absolute bottom-0 right-0">
-          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm">Cancel</button>
-          <button onClick={SaveButton} className="bg-blue-600 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm">Save</button>
+          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm hover:bg-blue-50">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-700 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm hover:bg-blue-500">Save</button>
         </div>
       </div>
     </div>
@@ -152,7 +152,8 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
             Name
           </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formName} onChange={nameChange}></input>
+            <input className="bg-gray-200 border-b-2 border-white focus:outline-none rounded-sm pl-2 h-7 w-11/12
+            focus:mb-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
           </div>
         </div>
         <div className="ml-10">
@@ -160,12 +161,13 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
             URL
           </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formURL} onChange={URLChange}></input>
+            <input className="bg-gray-200 border-b-2 focus:outline-none rounded-sm pl-2 h-7 w-11/12
+            focus:mb-2 focus:border-blue-500 transition" value={formURL} onChange={URLChange}></input>
           </div>
         </div>
         <div className="absolute bottom-0 right-0">
-          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm">Cancel</button>
-          <button onClick={SaveButton} className="bg-blue-600 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm">Save</button>
+          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm hover:bg-blue-50">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-700 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm hover:bg-blue-500">Save</button>
         </div>
       </div>
     </div>
@@ -206,7 +208,7 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
         }
       </div>
-      {optionsOpen && <div className="bg-green-300 absolute top-3 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+      {optionsOpen && <div className="shadow-xl border-gray-100 border-[1px] rounded-md bg-white absolute top-3 right-3 w-40 z-10 flex flex-col justify-start text-sm">
           <div className="ml-5 mt-3">
             <button onClick={newBookmark}> Add new bookmark</button> 
           </div>
@@ -320,7 +322,7 @@ function Viewport({content,files, setCurID}){
   let childArr = content.child_id.split(","); 
 
   var Cards = [];
-  childArr.forEach( (ID, ind) => {
+  childArr.map( (ID, ind) => {
     Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
       setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
   })
@@ -364,6 +366,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
     return <div/>
   }
   let tmp = files.find( x => x.id === parsed)
+  let imgStr = tmp.link+"/favicon.ico"
   if(tmp === undefined){
     console.log("IS UNDEFINED");
   } else {
@@ -373,7 +376,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
       })}>
       { tmp.type==="Folder"?
         <AiOutlineFolder className="h-6 w-6 mr-4"/>:
-        <img src='./img/chromeIcon'/>
+        <img src={imgStr} className="w-6 h-6 mr-4" />
       }
       {tmp.title}
       <div className="absolute right-4 mt-1">
@@ -381,7 +384,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
           <BsThreeDotsVertical />
         </div>
         { false && 
-          <div className="bg-green-300 relative top-0 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+          <div className="shadow-xl border-gray-100 border-[1px] bg-white rounded-md relative top-0 right-3 w-40 z-10 flex flex-col justify-start text-sm">
             <div className="ml-5 mt-3">
               <button onClick={handleOpenNewTabClick}> Open in New Tab</button> 
             </div>
