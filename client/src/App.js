@@ -49,6 +49,9 @@ function App() {
   
   return (
     <div>
+      {/* <div className="resize cursor-sw-resize bg-pink-400">
+        REsize me
+      </div> */}
       <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}/>
       
       {
@@ -175,11 +178,9 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
     setOptionsOpen(!optionsOpen);
   }
   const optionsFocusedOut = (e) => {
-    console.log("OUT");
     setOptionsOpen(false)
   }
   const newBookmark = () => {
-    console.log("HEYAA");
     setLinkPopupOpen(true);
     setOptionsOpen(false);
   }
@@ -339,6 +340,24 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
       }
     }
   }
+  const handleOptionsClick = () => {
+    // setCardOptionsOpen(true);
+  }
+  const handleOpenNewTabClick = () => {
+    window.open(files.find(x => x.id===parseInt(cardID)).link);
+  }
+  const handleDeleteBookmarkClick = async () => {
+    // await axios.delete('/')
+  }
+  const handleEditBookmarkClick = () => {
+  }
+  const handleOpenNewWindowClick = () => {
+    window.open(files.find(x => x.id===parseInt(cardID)).link,"_blank", "fullscreen=1",
+    "location=1",
+    "titlebar=1",
+    "status=1",
+    "menubar=1",);
+  }
 
   let parsed = parseInt(cardID);
   if(isNaN(parsed)){
@@ -357,6 +376,27 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
         <img src='./img/chromeIcon'/>
       }
       {tmp.title}
+      <div className="absolute right-4 mt-1">
+        <div className="hover:bg-gray-200 absolute right-4 mt-1 rounded-full">
+          <BsThreeDotsVertical />
+        </div>
+        { false && 
+          <div className="bg-green-300 relative top-0 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+            <div className="ml-5 mt-3">
+              <button onClick={handleOpenNewTabClick}> Open in New Tab</button> 
+            </div>
+            <div className="ml-5 mb-3">
+              <button onClick={handleOpenNewWindowClick}> Open in New Window</button> 
+            </div>
+            <div className="ml-5 mb-3">
+              <button onClick={handleEditBookmarkClick}>Edit Bookmark</button> 
+            </div>
+            <div className="ml-5 mb-3">
+              <button onClick={handleDeleteBookmarkClick}>Delete Bookmark</button> 
+            </div>
+        </div> 
+        }
+      </div>
     </div>
   }
 }
