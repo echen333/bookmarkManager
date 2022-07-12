@@ -3,7 +3,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineSearch, AiOutlineFolder,  } from 'react-icons/ai'
 import { BsThreeDotsVertical } from 'react-icons/bs'
-import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md'
+import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown, MdHttp } from 'react-icons/md'
 import classNames from 'classnames';
 import axios from 'axios'
 
@@ -26,6 +26,7 @@ function App() {
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [folderPopupOpen, setFolderPopupOpen] = useState(false);
   const [collapsed, setCollapsed] = useState([])
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect( () => {
     async function fetchAll() {
@@ -52,7 +53,8 @@ function App() {
       {/* <div className="resize cursor-sw-resize bg-pink-400">
         REsize me
       </div> */}
-      <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}/>
+      <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}
+      searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
       
       {
         folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}/>
@@ -64,7 +66,8 @@ function App() {
       <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
       
       <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
-        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
+        searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
       </div>
     </div>
   );
@@ -174,7 +177,7 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
   )
 }
 
-function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOpen}) {
+function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOpen, searchQuery, setSearchQuery}) {
   const optionsClicked = async() => {
     const ret = await axios.get('/polls/1/getBookmark')
     setOptionsOpen(!optionsOpen);
@@ -190,6 +193,9 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
     setFolderPopupOpen(true);
     setOptionsOpen(false);
   }
+  const searchChange = (e) => {
+    setSearchQuery(e.target.value)
+  }
 
   return (
     <div className="flex h-10 mt-1 mb-3 items-center">
@@ -202,7 +208,7 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         <AiOutlineSearch className="h-6 w-6 hover:bg-gray-300 hover: cursor-pointer rounded-full ml-2"/>
         <input className="pl-3 focus:outline-none bg-gray-100 w-full"
           placeholder="Search bookmarks"
-          type="search"/>
+          type="search" onChange={searchChange} value={searchQuery}/>
       </div>
       <div className="h-8 w-8 mx-3 hover:bg-gray-300 rounded-full" onClick={optionsClicked} onBlur={optionsFocusedOut}>
         {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
@@ -311,7 +317,7 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
   </div>
 }
 
-function Viewport({content,files, setCurID}){
+function Viewport({content,files, setCurID, searchQuery, setSearchQuery}){
 
   const [focusedCard, setCardFocus] = useState(-1);
 
@@ -322,10 +328,19 @@ function Viewport({content,files, setCurID}){
   let childArr = content.child_id.split(","); 
 
   var Cards = [];
-  childArr.map( (ID, ind) => {
-    Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
-      setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
-  })
+  if(searchQuery.length>0){
+    files.forEach(x => {
+      if(x.title.includes(searchQuery) || x.link.includes(searchQuery)){
+        Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
+          setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
+      }
+    })
+  } else {
+    childArr.map( (ID, ind) => {
+      Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
+        setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
+    })
+  }
   return Cards;
 }
 
@@ -367,6 +382,13 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
   }
   let tmp = files.find( x => x.id === parsed)
   let imgStr = tmp.link+"/favicon.ico"
+  let imgFound = true;
+  // try {
+  //   axios.get(imgStr);
+  // } catch (error) {
+  //   console.log("ASJDKLsa");
+  //   imgFound=false;
+  // }
   if(tmp === undefined){
     console.log("IS UNDEFINED");
   } else {
@@ -376,7 +398,9 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
       })}>
       { tmp.type==="Folder"?
         <AiOutlineFolder className="h-6 w-6 mr-4"/>:
-        <img src={imgStr} className="w-6 h-6 mr-4" />
+          imgFound?
+          <img src={imgStr} className="w-6 h-6 mr-4" />
+          :<img src="http://google.com/favicon.ico" className="w-6 h-6 mr-4" />
       }
       {tmp.title}
       <div className="absolute right-4 mt-1">
