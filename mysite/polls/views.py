@@ -69,7 +69,7 @@ def addLink(request):
 def addFolder(request):
     par = Item.objects.get(pk=request.POST['par_id'])
     #needs to be type addFolder
-    if par.type != "Folder":
+    if par.type != "Folder" and par.id!=1:
         print("NONO Folder")
         raise Http404("Not a folder")
         

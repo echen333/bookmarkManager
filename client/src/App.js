@@ -47,9 +47,9 @@ function App() {
         linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}/>
       }
 
-      <SideBar files={files} curId={curId} setCurID={setCurID}/>
+      <SideBar2 files={files} curId={curId} setCurID={setCurID}/>
       
-      <div className="inline-block ml-36 mr-10 max-w-screen-lg w-screen shadow-2xl">
+      <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID}/>
       </div>
 
@@ -83,21 +83,21 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files}) {
     setFormName(e.target.value);
   }
   return (
-    <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
-      <div className="bg-white relative w-72 h-56 left-2/4 top-2/4 rounded-lg z-50">
-        <div className="ml-10 font-bold"> Add Folder
+    <div className="bg-cover bg-gray-800 z-40 opacity-70 absolute left-0 right-0 top-0 bottom-0">
+      <div className="bg-white absolute w-[30rem] h-48 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
+        <div className="ml-10 font-semibold mt-6 mb-3"> Add Folder
         </div>
-        <div className="ml-10">
-          <div className="text-sm">
+        <div className="ml-10 mb-8">
+          <div className="text-[10px] font-bold text-gray-700 mb-2">
             Name
           </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formName} onChange={nameChange}></input>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formName} onChange={nameChange}></input>
           </div>
         </div>
         <div className="absolute bottom-0 right-0">
-          <button onClick={CancelButton} className="bg-white border-gray-500 border-2 rounded-lg w-16 h-10 text-blue-600">Cancel</button>
-          <button onClick={SaveButton} className="bg-blue-500 rounded-lg w-16 h-10 mr-4 mb-4">Save</button>
+          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-600 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm">Save</button>
         </div>
       </div>
     </div>
@@ -138,26 +138,28 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
 
   return (
     <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
-      <div className="bg-white relative w-72 h-56 left-2/4 top-2/4 rounded-lg z-50">
-        <div className="ml-10 font-bold"> Add Bookmark
+      <div className="bg-white absolute w-[30rem] h-72 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
+        <div className="ml-10 font-semibold mt-6 mb-3"> Add Bookmark
         </div>
-        <div className="ml-10">
-          <div className="text-sm">
+        <div className="ml-10 mb-8">
+          <div className="text-[10px] font-bold text-gray-700 mb-2">
             Name
           </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formName} onChange={nameChange}></input>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formName} onChange={nameChange}></input>
           </div>
         </div>
-        <div className="ml-10 text-sm">
-          URL
+        <div className="ml-10">
+        <div className="text-[10px] font-bold text-gray-700 mb-2">
+            URL
+          </div>
           <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2" value={formURL} onChange={URLChange}></input>
+            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12" value={formURL} onChange={URLChange}></input>
           </div>
         </div>
         <div className="absolute bottom-0 right-0">
-          <button onClick={CancelButton} className="bg-white border-gray-500 border-2 rounded-lg w-16 h-10 text-blue-600">Cancel</button>
-          <button onClick={SaveButton} className="bg-blue-500 rounded-lg w-16 h-10 mr-4 mb-4">Save</button>
+          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm">Cancel</button>
+          <button onClick={SaveButton} className="bg-blue-600 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm">Save</button>
         </div>
       </div>
     </div>
@@ -200,18 +202,58 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
         }
       </div>
-      {optionsOpen && <div className="bg-green-300 fixed top-5 right-5 h-32 w-44 z-10">
-          <button onClick={newBookmark}> Add new bookmark</button> 
-          <button onClick={newFolder}> Add new folder</button> 
+      {optionsOpen && <div className="bg-green-300 absolute top-3 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+          <div className="ml-5 mt-3">
+            <button onClick={newBookmark}> Add new bookmark</button> 
+          </div>
+          <div className="ml-5 mb-3">
+            <button onClick={newFolder}> Add new folder</button> 
+          </div>
         </div> 
       }
     </div>
   )
 }
 
+function SideBar2({files, curId, setCurID, dfsNode=1}) {
+  console.log("DFS",dfsNode);
+  let tmp = files.find(x => x.id===dfsNode);
+  console.log("TMP",tmp, "CHILDREN");
+  let foldersBel=[]
+  if(tmp){
+    let childArr = tmp.child_id.split(',').slice(1);
+    console.log("CHILDARR",childArr);
+    childArr.forEach( x => {
+      let z = files.find(y => y.id === parseInt(x))
+      if (z && z.type=="Folder"){
+        foldersBel.push(z)
+      }
+    })
+  }
+  console.log("FOLDERS", foldersBel);
+
+  return (
+    <div className="fixed w-52 h-screen">
+        {
+          foldersBel.map( (x,ind) => {
+            return <div className={classNames("hover:bg-gray-200 rounded-r-full",
+              {
+                // TODO: should be taking from child if child hovered
+              'bg-blue-200': x.id===curId,
+              'hover: bg-blue-200': x.id===curId
+              }
+            )}>
+              <File key={ind} val={x} curId={curId} setCurID={setCurID}/>
+              <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id}/>
+            </div>
+          })
+        }
+      </div>
+  )
+}
 function SideBar({files, curId, setCurID}) {
   return (
-    <div className="fixed w-32 h-screen">
+    <div className="fixed w-52 h-screen">
         {
           files.filter(x => x.type==="Folder").map( (x,ind) => {
             return <div className={classNames("hover:bg-gray-200 rounded-r-full",
@@ -229,25 +271,25 @@ function SideBar({files, curId, setCurID}) {
   )
 }
 function File({val, curId, setCurID}) {
-
+  console.log("VAL",val);
   const handleClick = () => {
     setCurID(val.id);
   }
-
+  console.log(val, "DEPTH TEST");
   return <div > 
     {/* TODO: className={val.depth} */}
     <div className={classNames('hover:cursor-pointer rounded-r-full h-10', 
       {
         'bg-blue-200':val.id===curId,
         'hover: bg-blue-200':val.id===curId,
+        [`ml-${val.depth*2}`]: true
       }
     )} onClick={handleClick}>
-      <div className="flex align-middle">
+      <div className="flex">
         {val.type=="Folder" && 
-            <div className="inline-block">
-              <MdKeyboardArrowDown className="h-6 w-6 mt-2 ml-3 mr-2"/>
-              {/* <MdOutlineKeyboardArrowRight/> */}
-              <AiOutlineFolder className="h-6 w-6 mt-2 mr-2"/>
+            <div className="flex mt-2 mr-2">
+              <MdKeyboardArrowDown className="h-6 w-6 mr-1"/>
+              <AiOutlineFolder className="h-6 w-6"/>
             </div>
             }
         
@@ -269,12 +311,13 @@ function Viewport({content,files, setCurID}){
   //files search for id
   let childArr = content.child_id.split(","); 
 
+  console.log("CURID", content);
   var Cards = [];
   childArr.forEach( (ID, ind) => {
+    console.log("CHILD", ID, content.id);
     Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
       setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
   })
-
   return Cards;
 }
 
@@ -294,18 +337,20 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
 
   let parsed = parseInt(cardID);
   if(isNaN(parsed)){
-    return <div>
-    </div>
+    return <div/>
   }
   let tmp = files.find( x => x.id === parsed)
-  
   if(tmp === undefined){
-    console.log("AJKLSJDlkjasld");
+    console.log("IS UNDEFINED");
   } else {
-    return <div onClick={handleClick} className={classNames("cursor-pointer",
+    return <div onClick={handleClick} className={classNames("cursor-pointer py-2 pl-6 flex",
       {
         'bg-blue-200': parseInt(cardID) === focusedCard
       })}>
+      { tmp.type==="Folder"?
+        <AiOutlineFolder className="h-6 w-6 mr-4"/>:
+        <img src='./img/chromeIcon'/>
+      }
       {tmp.title}
     </div>
   }
