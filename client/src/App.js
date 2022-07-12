@@ -25,17 +25,28 @@ function App() {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [folderPopupOpen, setFolderPopupOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState([])
 
   useEffect( () => {
     async function fetchAll() {
       const ret = await axios.get('/polls/getAll');
       console.log(ret);
       setFiles(ret.data)
+      
+      let tmpCollapsed = [];
+        ret.data.forEach( x => {
+          if(x.type==="Folder" && !collapsed.find(y => y.id===x.id)){
+            tmpCollapsed.push({"id":x.id, "isCollapsed": false});
+          }
+        })
+      console.log("TMPCOLLAPSED", tmpCollapsed);
+      setCollapsed(tmpCollapsed);
     }
     fetchAll();
-
+    
+    
   }, [])
-
+  
   return (
     <div>
       <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}/>
@@ -47,14 +58,11 @@ function App() {
         linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}/>
       }
 
-      <SideBar2 files={files} curId={curId} setCurID={setCurID}/>
+      <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
       
       <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
-        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID}/>
+        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
       </div>
-
-
-      
     </div>
   );
 }
@@ -68,13 +76,8 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files}) {
     var bodyFormData = new FormData();
     bodyFormData.append('title', formName);
     bodyFormData.append('par_id', curId);
-    for (var key of bodyFormData.entries()) {
-      console.log(key[0] + ', ' + key[1]);
-    }
     const ret = await axios.post('/polls/addFolder/', bodyFormData);
     // TODO: setFiles( files => [...files, obj])
-    // console.log(files, obj);
-    console.log(ret);
   }
   const CancelButton = () => {
     setFolderPopupOpen(false);
@@ -215,14 +218,11 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
   )
 }
 
-function SideBar2({files, curId, setCurID, dfsNode=1}) {
-  console.log("DFS",dfsNode);
+function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed}) {
   let tmp = files.find(x => x.id===dfsNode);
-  console.log("TMP",tmp, "CHILDREN");
   let foldersBel=[]
   if(tmp){
     let childArr = tmp.child_id.split(',').slice(1);
-    console.log("CHILDARR",childArr);
     childArr.forEach( x => {
       let z = files.find(y => y.id === parseInt(x))
       if (z && z.type=="Folder"){
@@ -230,69 +230,76 @@ function SideBar2({files, curId, setCurID, dfsNode=1}) {
       }
     })
   }
-  console.log("FOLDERS", foldersBel);
 
   return (
     <div className="fixed w-52 h-screen">
         {
           foldersBel.map( (x,ind) => {
-            return <div className={classNames("hover:bg-gray-200 rounded-r-full",
+            return <div>
+              <div className={classNames("hover:bg-gray-200 rounded-r-full",
               {
                 // TODO: should be taking from child if child hovered
               'bg-blue-200': x.id===curId,
               'hover: bg-blue-200': x.id===curId
               }
-            )}>
-              <File key={ind} val={x} curId={curId} setCurID={setCurID}/>
-              <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id}/>
+              )}>
+                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+              </div>
+              { collapsed && collapsed.find(y=> y.id===x.id) && 
+                !collapsed.find(y=> y.id===x.id).isCollapsed?
+                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed}/>:
+                <div>
+                </div>
+              }
             </div>
           })
         }
       </div>
   )
 }
-function SideBar({files, curId, setCurID}) {
-  return (
-    <div className="fixed w-52 h-screen">
-        {
-          files.filter(x => x.type==="Folder").map( (x,ind) => {
-            return <div className={classNames("hover:bg-gray-200 rounded-r-full",
-              {
-                // TODO: should be taking from child if child hovered
-              'bg-blue-200': x.id===curId,
-              'hover: bg-blue-200': x.id===curId
-              }
-            )}>
-              <File key={ind} val={x} curId={curId} setCurID={setCurID}/>
-            </div>
-          })
-        }
-      </div>
-  )
-}
-function File({val, curId, setCurID}) {
-  console.log("VAL",val);
+function File({val, curId, setCurID, collapsed, setCollapsed}) {
   const handleClick = () => {
     setCurID(val.id);
   }
-  console.log(val, "DEPTH TEST");
+  const handleCollapseClick = () => {
+    let ind = collapsed.findIndex(x => x.id === val.id);
+    if(ind){
+      let tmp = [...collapsed];
+      let OBJ=collapsed[ind];
+      console.log(val, ind, OBJ);
+      tmp[ind] = {"id":val.id, "isCollapsed":!OBJ.isCollapsed}
+      console.log("TMP", tmp);
+      setCollapsed(tmp);
+    }
+  }
+  let TMP=false;
+  if(collapsed){
+    let TMP2=collapsed.find(x => x.id===val.id)
+    if(TMP2){
+      TMP = TMP2.isCollapsed;
+    }
+    console.log("TMP",TMP);
+  }
+  
   return <div > 
-    {/* TODO: className={val.depth} */}
     <div className={classNames('hover:cursor-pointer rounded-r-full h-10', 
       {
         'bg-blue-200':val.id===curId,
         'hover: bg-blue-200':val.id===curId,
-        [`ml-${val.depth*2}`]: true
+        [`pl-${val.depth}`]: true
       }
     )} onClick={handleClick}>
       <div className="flex">
         {val.type=="Folder" && 
             <div className="flex mt-2 mr-2">
-              <MdKeyboardArrowDown className="h-6 w-6 mr-1"/>
+              <div className="rounded-full hover:bg-gray-500 py-0.5" onClick={handleCollapseClick}>
+                { !TMP ? <MdKeyboardArrowDown className="h-6 w-6 mr-1"/>:
+                <MdOutlineKeyboardArrowRight className="h-6 w-6 mr-1"/>
+                }
+              </div>
               <AiOutlineFolder className="h-6 w-6"/>
             </div>
             }
-        
         <div className="pt-2 inline-block">
           {val.title}
         </div>
@@ -311,10 +318,8 @@ function Viewport({content,files, setCurID}){
   //files search for id
   let childArr = content.child_id.split(","); 
 
-  console.log("CURID", content);
   var Cards = [];
   childArr.forEach( (ID, ind) => {
-    console.log("CHILD", ID, content.id);
     Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
       setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
   })
