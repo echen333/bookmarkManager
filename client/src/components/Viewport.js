@@ -30,14 +30,20 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
         }
       })
     } else {
-      childArr2.map( (ID, ind) => {
-        Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
-          setCardFocus={setCardFocus} focusedCard={focusedCard}
-          cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
-          fetchAll={fetchAll} ind={ind} len={childArr2.length}
-          curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
-          />)
-      })
+      if(childArr2.length === 0) {
+        // -translate-x-1/2 transform
+        Cards.push( <div className="text-gray-600 font-semibold left-1/2 relative">Bookmarks folder is empty</div>)
+      } else {
+        childArr2.map( (ID, ind) => {
+          Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
+            setCardFocus={setCardFocus} focusedCard={focusedCard}
+            cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
+            fetchAll={fetchAll} ind={ind} len={childArr2.length}
+            curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+            />)
+        })
+      }
+      
     }
     return Cards;
 }
@@ -109,6 +115,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
       if(files.find(x => x.id === parseInt(cardID)).type === "Folder"){
         console.log(curIdDragging, "DROPPED", cardID);//need the cardID for which dropped
         await axios.get(`/polls/${curIdDragging}/${cardID}/changePar`)
+        fetchAll();
         // console.log(e.target);
       }
     }

@@ -3,7 +3,7 @@ import { AiOutlineFolder,  } from 'react-icons/ai'
 import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md'
 import classNames from 'classnames';
 
-function File({val, curId, setCurID, collapsed, setCollapsed, myDepth}) {
+function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel}) {
     const handleClick = () => {
       setCurID(val.id);
     }
@@ -23,23 +23,27 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth}) {
         TMP = TMP2.isCollapsed;
       }
     }
+    console.log(numBel>0, val.id, numBel);
     
     return <div > 
       <div className={classNames('hover:cursor-pointer rounded-r-full h-10 flex flex-col', 
         {
           'bg-blue-200':val.id===curId,
           'hover: bg-blue-200':val.id===curId,
-          [`pl-${myDepth}`]: true
+          [`pl-${3*myDepth}`]: true
         }
       )} onClick={handleClick}>
         <div className="flex">
           {val.type === "Folder" && 
               <div className="flex mt-2 mr-2">
-                <div className="rounded-full hover:bg-gray-500 py-0.5" onClick={handleCollapseClick}>
-                  { !TMP ? <MdKeyboardArrowDown className="h-6 w-6 mr-1"/>:
-                  <MdOutlineKeyboardArrowRight className="h-6 w-6 mr-1"/>
-                  }
-                </div>
+                {
+                  numBel>0 && 
+                    <div className="rounded-full hover:bg-gray-500 py-0.5" onClick={handleCollapseClick}>
+                      { !TMP ? <MdKeyboardArrowDown className="h-6 w-6 mr-1"/>:
+                      <MdOutlineKeyboardArrowRight className="h-6 w-6 mr-1"/>
+                      }
+                    </div>
+                }
                 <AiOutlineFolder className="h-6 w-6"/>
               </div>
               }

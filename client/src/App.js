@@ -86,7 +86,7 @@ function App() {
       }
       
       <div className="fixed min-w-fit h-screen resize cursor-e-resize">
-        <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+        <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} fetchAll={fetchAll}/>
       </div>
       
       {/* <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 max-w-5xl"> */}

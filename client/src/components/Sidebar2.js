@@ -1,20 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import File from './File'
 
-function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, depth=0}) {
-    let tmp = files.find(x => x.id===dfsNode);
-    let foldersBel=[]
-    if(tmp){
-      let childArr = tmp.child_id.split(',').filter(x => x!=='');
-      childArr.forEach( x => {
-        let z = files.find(y => y.id === parseInt(x))
-        if (z && z.type==="Folder"){
-          foldersBel.push(z)
-        }
-      })
-    }
+function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, depth=0, fetchAll}) {
+    const [foldersBel, setFoldersBel] = useState([])
+
+  useEffect( ()=> { //BUG: DOES NOT UPDATE AFTER FETCH ALL
+    // console.log("UPDATED SIDEBAR 2");
+      let tmp = files.find(x => x.id===dfsNode);
+      let tmpFolders = [];
+      if(tmp){
+        let childArr = tmp.child_id.split(',').filter(x => x!=='');
+        childArr.forEach( x => {
+          let z = files.find(y => y.id === parseInt(x))
+          if (z && z.type==="Folder"){
+            tmpFolders.push(z)
+          }
+        })
+        setFoldersBel(tmpFolders);
+        // console.log("BEL", tmpFolders, childArr);
+      }
+  }, [files])
   
+    console.log(dfsNode, foldersBel.length);
     return (
       <div>
         {
@@ -27,7 +35,7 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, d
               'hover: bg-blue-200': x.id===curId
               }
               )}>
-                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} myDepth={depth}/>
+                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} myDepth={depth} numBel={foldersBel.length}/>
               </div>
               { collapsed && collapsed.find(y=> y.id===x.id) && 
                 !collapsed.find(y=> y.id===x.id).isCollapsed?
