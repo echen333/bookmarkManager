@@ -319,34 +319,36 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
       setOlistening(!cardOptionsOpen)
   }, [cardOptionsOpen])
   
+  console.log("OIPTIONS OPEN", cardOptionsOpen);
   if(content === undefined){
     return <div></div>
   }
-  //files search for id
   let childArr = content.child_id.split(","); 
+  //filter to see if is active ID
+  let childArr2 = childArr.filter(x => files.find(y => y.id === parseInt(x)));
 
   var Cards = [];
   if(searchQuery.length>0){
-    files.forEach(x => {
+    files.forEach((x, ind) => {
       if(x.title.includes(searchQuery) || x.link.includes(searchQuery)){
         Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
           setCardFocus={setCardFocus} focusedCard={focusedCard}
           cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
-          fetchAll={fetchAll}/>)
+          fetchAll={fetchAll} ind={ind} len={childArr2.length}/>)
       }
     })
   } else {
-    childArr.map( (ID, ind) => {
+    childArr2.map( (ID, ind) => {
       Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
         setCardFocus={setCardFocus} focusedCard={focusedCard}
         cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
-        fetchAll={fetchAll}/>)
+        fetchAll={fetchAll} ind={ind} len={childArr2.length}/>)
     })
   }
   return Cards;
 }
 
-function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll}){
+function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll, ind, len}){
 
   const menuRef = useRef(null);
   const [cardListening, setCardListening] = useState(false);
@@ -393,6 +395,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
   ));
   useEffect( () => {
     if(cardOptionsOpen && cardOptionsID===cardID){
+      console.log("IM LISTENING", cardID);
       setCardListening(false)
     } else {
       setCardListening(true)
@@ -409,18 +412,14 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
   }
   let imgStr = tmp.link+"/favicon.ico"
   let imgFound = true;
-  // try {
-  //   axios.get(imgStr);
-  // } catch (error) {
-  //   console.log("ASJDKLsa");
-  //   imgFound=false;
-  // }
   if(tmp === undefined){
     console.log("IS UNDEFINED");
   } else {
     return <div onClick={handleClick} className={classNames("cursor-pointer py-2 pl-6 flex",
       {
-        'bg-blue-200': parseInt(cardID) === focusedCard
+        'bg-blue-200': parseInt(cardID) === focusedCard,
+        'mt-2': ind===0,
+        'mb-2': ind===len-1
       })}>
       { tmp.type==="Folder"?
         <AiOutlineFolder className="h-6 w-6 mr-4"/>:
