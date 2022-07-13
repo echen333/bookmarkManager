@@ -7,11 +7,36 @@ import listenForOutsideClicks from '../utils/listenForOutsideClicks';
 
 function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging}){
 
-    const [focusedCard, setCardFocus] = useState(-1);
+    const [focusedCards, setFocusedCards] = useState([]);
     const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
     const [cardOptionsID, setCardOptionsID] = useState(-1);
     const [curIndexDragging, setCurIndexDragging] = useState(-1);
-    
+    const [ctrlDown, setCtrlDown] = useState(false);
+
+    useEffect( () => {
+      const handleType = (event) => {
+        if (event.key === 'Control'){
+          setCtrlDown(true);
+          return;
+        }
+        return;
+      }
+      const handleUp = (event) => {
+        if (event.key === 'Control'){
+          setCtrlDown(false);
+          return;
+        }
+        return;
+      }
+      window.addEventListener('keydown', handleType)
+      window.addEventListener('keyup', handleUp)
+  
+      return () => {
+        window.removeEventListener('keydown', handleType)
+        window.removeEventListener('keyup', handleUp)
+      }
+  }, []);
+
     if(content === undefined){
       return <div></div>
     }
@@ -24,7 +49,7 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
       files.forEach((x, ind) => {
         if(x.title.includes(searchQuery) || x.link.includes(searchQuery)){
           Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
-            setCardFocus={setCardFocus} focusedCard={focusedCard}
+            setFocusedCards={setFocusedCards} focusedCards={focusedCards}
             cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
             fetchAll={fetchAll} ind={ind} len={childArr2.length}
             curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} curIndexDragging={curIndexDragging} setCurIndexDragging={setCurIndexDragging}
@@ -38,10 +63,11 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
       } else {
         childArr2.map( (ID, ind) => {
           Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
-            setCardFocus={setCardFocus} focusedCard={focusedCard}
+            setFocusedCards={setFocusedCards} focusedCards={focusedCards}
             cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
             fetchAll={fetchAll} ind={ind} len={childArr2.length}
             curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} curIndexDragging={curIndexDragging} setCurIndexDragging={setCurIndexDragging}
+            ctrlDown={ctrlDown} setCtrlDown={setCtrlDown}
             />)
         })
       }
@@ -50,8 +76,8 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
     return Cards;
 }
 
-function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll, ind, len, curIdDragging, setCurIdDragging,
-              curIndexDragging, setCurIndexDragging}){
+function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll, ind, len, curIdDragging, setCurIdDragging,
+              curIndexDragging, setCurIndexDragging, ctrlDown, setCtrlDown}){
 
     const menuRef = useRef(null);
     const [cardListening, setCardListening] = useState(false);
@@ -59,7 +85,15 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
     const [draggedFolderOver, setDraggedFolderOver] = useState(false);
   
     const handleClick = (e) => {
-      setCardFocus(parseInt(cardID));
+      if (ctrlDown) {
+        if (focusedCards.includes(parseInt(cardID))){
+          setFocusedCards(focusedCards.filter(x => x!== parseInt(cardID)));
+        } else {
+          setFocusedCards([...focusedCards, parseInt(cardID)]);
+        }
+      } else {
+        setFocusedCards([parseInt(cardID)]);
+      }
       if(e.detail>=2){
         const itemSelected = files.find( x => parseInt(cardID) === x.id);
         if (itemSelected && itemSelected.type==="Folder"){
@@ -126,6 +160,9 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
         fetchAll();
         // console.log(e.target);
       } else {
+        if(curIdDragging === cardID){
+          return;
+        }
         console.log(curIdDragging, "DROPPED", cardID);//need the cardID for which dropped
         if (ind<curIndexDragging){
           await axios.get(`/polls/${curIdDragging}/${cardID}/1/changeOrder`)
@@ -150,7 +187,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
         setCardListening(true)
       }
     }, [cardOptionsOpen])
-  
+    
     let parsed = parseInt(cardID);
     if(isNaN(parsed)){
       return <div/>
@@ -167,7 +204,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
       return <div onClick={handleClick} onDragStart={dragStarts} onDrag={isDragging} onDragLeave={dragLeave} draggable={true} onDragOver={dragOver} onDrop={handleDrop}
         className={classNames("cursor-pointer py-2 pl-6 flex border-y-2",
         {
-          'bg-blue-200': parseInt(cardID) === focusedCard || draggedFolderOver,
+          'bg-blue-200': focusedCards.includes(parseInt(cardID)) || draggedFolderOver,
           'border-blue-400': draggedOver,
           'border-white': !draggedOver,
           'border-t-2 border-b-white': draggedOver && ind<curIndexDragging,
@@ -183,7 +220,7 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
             :<img src="http://google.com/favicon.ico" className="w-6 h-6 mr-4" />
         }
         {tmp.title}
-        {parseInt(cardID) === focusedCard && <div className="ml-4 text-gray-500">
+        {focusedCards.includes(parseInt(cardID)) && <div className="ml-4 text-gray-500">
           {tmp.link}
           </div>}
         <div className="absolute right-4 mt-1">
