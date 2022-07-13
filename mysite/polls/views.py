@@ -1,4 +1,5 @@
 from re import I
+from unicodedata import name
 from django.shortcuts import render
 
 # Create your views here.
@@ -99,3 +100,27 @@ def deletes(request, my_id):
             deletes(request, x)
     print(Item.objects.all())
     return HttpResponse("Success");
+
+def sorts(request, my_id):
+    item = Item.objects.get(pk=my_id)
+    #sort by title first name
+    childArr = item.child_id.split(',')
+    if '' in childArr:
+        childArr.remove('')
+    
+    childArr2=[]
+    for x in range(len(childArr)):
+        if (Item.objects.filter(pk=childArr[x]).exists()):
+            childArr2.append(childArr[x])
+
+    sortedArr = sorted(childArr2, key=lambda x: Item.objects.get(pk=int(x)).title.lower());
+    
+    retJoin = "";
+    for x in range(len(sortedArr)):
+        if(x!=0):
+            retJoin+=","
+        retJoin+=str(sortedArr[x])
+    item.child_id=retJoin
+    item.save()
+    print(item.child_id)
+    return HttpResponse("Success")

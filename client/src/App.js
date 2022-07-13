@@ -67,7 +67,7 @@ function App() {
         REsize me
       </div> */}
       <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}
-      searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+      searchQuery={searchQuery} setSearchQuery={setSearchQuery} curId={curId} fetchAll={fetchAll}/>
       
       {
         folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}
@@ -85,7 +85,7 @@ function App() {
         <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
       </div>
       
-      <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
+      <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
         searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
         />
@@ -170,7 +170,7 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fet
   )
 }
 
-function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOpen, searchQuery, setSearchQuery}) {
+function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOpen, searchQuery, setSearchQuery, curId, fetchAll}) {
   const optionsClicked = async() => {
     const ret = await axios.get('/polls/1/getBookmark')
     setOptionsOpen(!optionsOpen);
@@ -188,6 +188,11 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
   }
   const searchChange = (e) => {
     setSearchQuery(e.target.value)
+  }
+  const sortChildren = async () => {
+    await axios.get(`/polls/${curId}/sorts`);
+    console.log("SORTED");
+    fetchAll();
   }
 
   return (
@@ -207,11 +212,16 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
         }
       </div>
-      {optionsOpen && <div className="shadow-2xl border-gray-100 border-[1px] rounded-md bg-white absolute top-2 right-3 w-40 z-10 flex flex-col justify-start text-sm">
-          <div className="ml-5 mt-3 my-2">
+      {optionsOpen && 
+        <div className="shadow-2xl border-gray-100 border-[1px] rounded-md bg-white absolute top-2 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+
+          <div className="ml-5 mt-3 my-1">
+            <button onClick={sortChildren}> Sort by name</button> 
+          </div>
+          <div className="ml-5 my-1">
             <button onClick={newBookmark}> Add new bookmark</button> 
           </div>
-          <div className="ml-5 mb-3">
+          <div className="ml-5 mb-3 my-1">
             <button onClick={newFolder}> Add new folder</button> 
           </div>
         </div> 
@@ -224,7 +234,7 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed}) 
   let tmp = files.find(x => x.id===dfsNode);
   let foldersBel=[]
   if(tmp){
-    let childArr = tmp.child_id.split(',').slice(1);
+    let childArr = tmp.child_id.split(',').filter(x => x!=='');
     childArr.forEach( x => {
       let z = files.find(y => y.id === parseInt(x))
       if (z && z.type=="Folder"){
@@ -319,7 +329,6 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
       setOlistening(!cardOptionsOpen)
   }, [cardOptionsOpen])
   
-  console.log("OIPTIONS OPEN", cardOptionsOpen);
   if(content === undefined){
     return <div></div>
   }
