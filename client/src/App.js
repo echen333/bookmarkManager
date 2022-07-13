@@ -12,6 +12,7 @@ import NavBar from './components/Navbar';
 import LinkPopup from './components/LinkPopup';
 import SideBar2 from './components/Sidebar2';
 import Viewport from './components/Viewport';
+import Alert from './components/Alert';
 
 /*
 properties of a file
@@ -37,6 +38,7 @@ function App() {
   const [Flistening, setFListening] = useState(false);
   const [Llistening, setLListening] = useState(false);
   const [curIdDragging, setCurIdDragging] = useState(-1);
+  const [msg, setAlertMsg] = useState("");
   
   async function fetchAll() {
     const ret = await axios.get('/polls/getAll');
@@ -74,6 +76,8 @@ function App() {
       <NavBar optionsOpen={optionsOpen} setOptionsOpen={setOptionsOpen} setFolderPopupOpen={setFolderPopupOpen} setLinkPopupOpen={setLinkPopupOpen}
       searchQuery={searchQuery} setSearchQuery={setSearchQuery} curId={curId} fetchAll={fetchAll}/>
       
+      <Alert msg={msg} setAlertMsg={setAlertMsg}/>
+
       {
         folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}
         Flistening={Flistening} setFListening={setFListening} fetchAll={fetchAll}/>
@@ -97,6 +101,7 @@ function App() {
         <Viewport content={files.find( x => x.id === curId)} files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
         searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
         curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+        msg={msg} setAlertMsg={setAlertMsg}
         />
       </div>
     </div>

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import axios from 'axios'
 import listenForOutsideClicks from '../utils/listenForOutsideClicks';
 
-function Viewport({content,files,curId, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging}){
+function Viewport({content,files,curId, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging, msg, setAlertMsg}){
 
     const [focusedCards, setFocusedCards] = useState([]);
     const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
@@ -18,6 +18,16 @@ function Viewport({content,files,curId, setCurID, searchQuery, setSearchQuery, f
       const handleType = async (event) => {
         if (event.keyCode ===67 && event.ctrlKey) {
           setClipboardIDs(focusedCards);
+          if(focusedCards.length >=2){
+            setAlertMsg(`${focusedCards.length} items copied`);
+          } else if (focusedCards.length === 1){
+            //UNTESTED
+            setAlertMsg(`${focusedCards.length} itemsd copied`);
+            // setAlertMsg(files.find(x => x.id === focusedCards[0]).title +" copied")
+          } else {
+            setAlertMsg("NONE")
+          }
+          setTimeout(setAlertMsg(""), 5000)
           console.log("COPIED!", focusedCards, focusedCards.length, focusedCards.length>0);
         }
         if (event.keyCode ===86 && event.ctrlKey) {
