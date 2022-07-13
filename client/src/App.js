@@ -81,13 +81,14 @@ function App() {
         />
       }
       
-      <div className="fixed min-w-fit h-screen resize cursor-e-resize bg-pink-300">
+      <div className="fixed min-w-fit h-screen resize cursor-e-resize">
         <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
       </div>
       
       <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
-        searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+        />
       </div>
     </div>
   );
@@ -309,7 +310,14 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
 function Viewport({content,files, setCurID, searchQuery, setSearchQuery}){
 
   const [focusedCard, setCardFocus] = useState(-1);
+  const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
+  const [cardOptionsID, setCardOptionsID] = useState(-1);
+  const [Olistening, setOlistening] = useState(false);
 
+  useEffect( ()=> {
+      setOlistening(!cardOptionsOpen)
+  }, [cardOptionsOpen])
+  
   if(content === undefined){
     return <div></div>
   }
@@ -321,19 +329,24 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery}){
     files.forEach(x => {
       if(x.title.includes(searchQuery) || x.link.includes(searchQuery)){
         Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
-          setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
+          setCardFocus={setCardFocus} focusedCard={focusedCard}
+          cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}/>)
       }
     })
   } else {
     childArr.map( (ID, ind) => {
       Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
-        setCardFocus={setCardFocus} focusedCard={focusedCard}/>)
+        setCardFocus={setCardFocus} focusedCard={focusedCard}
+        cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}/>)
     })
   }
   return Cards;
 }
 
-function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
+function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen}){
+
+  const menuRef = useRef(null);
+  const [cardListening, setCardListening] = useState(false);
 
   const handleClick = (e) => {
     setCardFocus(parseInt(cardID));
@@ -347,7 +360,9 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
     }
   }
   const handleOptionsClick = () => {
-    // setCardOptionsOpen(true);
+    setCardOptionsOpen(true);
+    setCardOptionsID(cardID);
+    console.log("HEY", cardID);
   }
   const handleOpenNewTabClick = () => {
     window.open(files.find(x => x.id===parseInt(cardID)).link);
@@ -364,6 +379,19 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
     "status=1",
     "menubar=1",);
   }
+  useEffect(listenForOutsideClicks(
+    cardListening,
+    setCardListening,
+    menuRef,
+    setCardOptionsOpen,
+  ));
+  useEffect( () => {
+    if(cardOptionsOpen && cardOptionsID===cardID){
+      setCardListening(false)
+    } else {
+      setCardListening(true)
+    }
+  }, [cardOptionsOpen])
 
   let parsed = parseInt(cardID);
   if(isNaN(parsed)){
@@ -393,12 +421,12 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard}){
       }
       {tmp.title}
       <div className="absolute right-4 mt-1">
-        <div className="hover:bg-gray-200 absolute right-4 mt-1 rounded-full">
+        <div onClick={handleOptionsClick} className="hover:bg-gray-200 absolute right-4 mt-1 rounded-full">
           <BsThreeDotsVertical />
         </div>
-        { false && 
-          <div className="shadow-xl border-gray-100 border-[1px] bg-white rounded-md relative top-0 right-3 w-40 z-10 flex flex-col justify-start text-sm">
-            <div className="ml-5 mt-3">
+        { cardOptionsOpen && cardID===cardOptionsID && 
+          <div ref={menuRef} className="shadow-xl border-gray-100 border-[1px] bg-white rounded-md relative top-0 right-3 w-44 z-10 flex flex-col justify-start text-sm">
+            <div className="ml-5 my-3">
               <button onClick={handleOpenNewTabClick}> Open in New Tab</button> 
             </div>
             <div className="ml-5 mb-3">

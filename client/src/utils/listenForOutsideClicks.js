@@ -1,6 +1,5 @@
 function listenForOutsideClicks(listening, setListening, menuRef, setIsOpen) {
     return () => {
-        console.log(listening, menuRef.current);
       if (listening) return;
       if (!menuRef.current) return;
       setListening(true);
