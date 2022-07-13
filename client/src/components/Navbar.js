@@ -25,6 +25,9 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
       console.log("SORTED");
       fetchAll();
     }
+    const exportBookmarks = () => {
+        
+    }
   
     return (
       <div className="flex h-10 mt-1 mb-3 items-center">
@@ -52,8 +55,15 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
             <div className="ml-5 my-1">
               <button onClick={newBookmark}> Add new bookmark</button> 
             </div>
-            <div className="ml-5 mb-3 my-1">
+            <div className="ml-5 my-1">
               <button onClick={newFolder}> Add new folder</button> 
+            </div>
+            <div className="ml-5 mb-3 my-1">
+                <a
+            href={require('../utils/bookmarks_7_12_22.txt')}
+            download
+            >Export Bookmarks</a>
+              {/* <button onClick={exportBookmarks}> Export Bookmarks</button>  */}
             </div>
           </div> 
         }
