@@ -85,7 +85,6 @@ def addFolder(request):
     par.save()
     
     print(Item.objects.all());
-    # TODO: par add child id
     return HttpResponse("Success");
 
 @csrf_exempt
@@ -186,5 +185,49 @@ def changeOrder(request, my_id, fixed_id, isBef):
         itemPar.child_id = arrTS(ret);
         itemPar.save();
         return HttpResponse("Success")
-        
+
     return HttpResponse("Fail")
+
+@csrf_exempt
+def pasteItems(request):
+    par = Item.objects.get(pk=request.POST['par_id'])
+    #needs to be type addFolder
+    if par.type != "Folder" and par.id!=1 and par.id!=2:
+        print("NONO Folder")
+        raise Http404("Not a folder")
+    
+    print(request.POST['clipboard'], type(request.POST['clipboard']))
+    CLIP = request.POST['clipboard'];
+    CLIP = CLIP[1:-1];
+    print(CLIP)
+    
+    intArr = CLIP.split(",")
+    if '' in intArr:
+        intArr.remove('')
+        
+    for y in intArr:
+        x = int(y)
+        print(x)
+        if Item.objects.filter(pk=x).exists():
+            curItem = Item.objects.get(pk=x);
+            print(curItem, curItem.type)
+            if curItem.type == "Folder":
+                newFolder = Item.objects.create(
+                    title=curItem.title,
+                    par_id=par.id,
+                    type="Folder",
+                    depth=par.depth+1
+                )
+                par.child_id = par.child_id+","+str(newFolder.id)
+            else:
+                newLink = Item.objects.create(
+                    link=curItem.link,
+                    title=curItem.title,
+                    par_id=par.id,
+                    type="Link",
+                    depth=par.depth+1
+                )
+                par.child_id = par.child_id+","+str(newLink.id)
+            par.save()
+    print(par, par.id, par.child_id);
+    return HttpResponse("Success");

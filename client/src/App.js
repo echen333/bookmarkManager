@@ -94,7 +94,7 @@ function App() {
       
       {/* <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 max-w-5xl"> */}
       <div className="flex flex-col ml-60 w-screen absolute justify-center align-middle shadow-xl border-[1px] border-gray-200 max-w-5xl">
-        <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
+        <Viewport content={files.find( x => x.id === curId)} files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
         searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
         curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
         />

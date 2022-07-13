@@ -5,16 +5,30 @@ import classNames from 'classnames';
 import axios from 'axios'
 import listenForOutsideClicks from '../utils/listenForOutsideClicks';
 
-function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging}){
+function Viewport({content,files,curId, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging}){
 
     const [focusedCards, setFocusedCards] = useState([]);
     const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
     const [cardOptionsID, setCardOptionsID] = useState(-1);
     const [curIndexDragging, setCurIndexDragging] = useState(-1);
     const [ctrlDown, setCtrlDown] = useState(false);
+    const [clipboardIDs, setClipboardIDs] = useState([]);
 
     useEffect( () => {
-      const handleType = (event) => {
+      const handleType = async (event) => {
+        if (event.keyCode ===67 && event.ctrlKey) {
+          setClipboardIDs(focusedCards);
+          console.log("COPIED!", focusedCards, focusedCards.length, focusedCards.length>0);
+        }
+        if (event.keyCode ===86 && event.ctrlKey) {
+          console.log("PASTE!", focusedCards, focusedCards.length, focusedCards.length>0);
+          var bodyFormData = new FormData();
+          bodyFormData.append('clipboard', clipboardIDs);
+          bodyFormData.append('par_id', curId);
+          console.log("PASTE", curId, clipboardIDs);
+          // const ret = await axios.post('/polls/addFolder/', bodyFormData);
+          await axios.post('/polls/pasteItems/', bodyFormData)
+        }
         if (event.key === 'Control'){
           setCtrlDown(true);
           return;
