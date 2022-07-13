@@ -1,11 +1,13 @@
 import logo from './logo.svg';
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineSearch, AiOutlineFolder,  } from 'react-icons/ai'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown, MdHttp } from 'react-icons/md'
 import classNames from 'classnames';
 import axios from 'axios'
+import FolderPopup from './components/FolderPopup';
+import listenForOutsideClicks from './utils/listenForOutsideClicks';
 
 /*
 properties of a file
@@ -27,6 +29,8 @@ function App() {
   const [folderPopupOpen, setFolderPopupOpen] = useState(false);
   const [collapsed, setCollapsed] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [Flistening, setFListening] = useState(false);
+  const [Llistening, setLListening] = useState(false);
 
   useEffect( () => {
     async function fetchAll() {
@@ -40,7 +44,6 @@ function App() {
             tmpCollapsed.push({"id":x.id, "isCollapsed": false});
           }
         })
-      console.log("TMPCOLLAPSED", tmpCollapsed);
       setCollapsed(tmpCollapsed);
     }
     fetchAll();
@@ -48,6 +51,16 @@ function App() {
     
   }, [])
   
+  useEffect( ()=> {
+    if(folderPopupOpen){
+      setFListening(false);
+    } else setFListening(true);
+  }, [folderPopupOpen])
+
+  useEffect( ()=> {
+    setLListening(!linkPopupOpen)
+  }, [linkPopupOpen])
+
   return (
     <div>
       {/* <div className="resize cursor-sw-resize bg-pink-400">
@@ -57,13 +70,20 @@ function App() {
       searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
       
       {
-        folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}/>
+        folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}
+        Flistening={Flistening} setFListening={setFListening}/>
+        // Flistening kinda redundant cuz is just folderPopupOpen
       }
       {
-        linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}/>
+        linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}
+        listening={Llistening} setListening={setLListening}
+        // listening={!linkPopupOpen} setListening={setLinkPopupOpen} this part doesn't seem too work bc too fast and registers click already?
+        />
       }
-
-      <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+      
+      <div className="fixed min-w-fit h-screen resize cursor-e-resize bg-pink-300">
+        <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+      </div>
       
       <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
@@ -73,49 +93,11 @@ function App() {
   );
 }
 
-function FolderPopup({setFolderPopupOpen, curId, setFiles, files}) {
-    
-  const [formName, setFormName] = useState("");
-
-  const SaveButton = async () => {
-    setFolderPopupOpen(false);
-    var bodyFormData = new FormData();
-    bodyFormData.append('title', formName);
-    bodyFormData.append('par_id', curId);
-    const ret = await axios.post('/polls/addFolder/', bodyFormData);
-    // TODO: setFiles( files => [...files, obj])
-  }
-  const CancelButton = () => {
-    setFolderPopupOpen(false);
-  }
-  const nameChange = (e) => {
-    setFormName(e.target.value);
-  }
-  return (
-    <div className="bg-cover bg-gray-800 z-40 opacity-70 absolute left-0 right-0 top-0 bottom-0">
-      <div className="bg-white absolute w-[30rem] h-48 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
-        <div className="ml-10 font-semibold mt-6 mb-3"> Add Folder
-        </div>
-        <div className="ml-10 mb-8 focus-within:text-blue-500">
-          <div className="text-[10px] font-bold text-gray-700">
-            Name
-          </div>
-          <div>
-            <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
-          </div>
-        </div>
-        <div className="absolute bottom-0 right-0">
-          <button onClick={CancelButton} className="bg-white border-gray-300 border-[1px] rounded-md w-16 h-8 mr-4 text-blue-600 font-bold text-sm hover:bg-blue-50">Cancel</button>
-          <button onClick={SaveButton} className="bg-blue-700 rounded-md w-16 h-8 mr-4 mb-4 text-white font-semibold text-sm hover:bg-blue-500">Save</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-function LinkPopup({setLinkPopupOpen, curId, files}) {
+function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening}) {
     
   const [formName, setFormName] = useState("");
   const [formURL, setFormURL] = useState("");
+  const menuRef = useRef(null);
 
   const SaveButton = async () => {
     setLinkPopupOpen(false);
@@ -123,7 +105,6 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
     let tmp = formURL;
     if(!formURL.includes("http")){
       tmp = "http://"+formURL;
-      console.log(tmp);
       setFormURL(tmp);
     }
     bodyFormData.append('link', tmp);
@@ -145,9 +126,18 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
     setFormURL(e.target.value);
   }
 
+  useEffect(listenForOutsideClicks(
+    listening,
+    setListening,
+    menuRef,
+    setLinkPopupOpen,
+  ));
+
   return (
-    <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
-      <div className="bg-white absolute w-[30rem] h-72 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
+    <div>
+      <div className="bg-cover bg-gray-600 z-40 opacity-75 absolute left-0 right-0 top-0 bottom-0">
+      </div>
+      <div ref={menuRef} className="bg-white absolute w-[30rem] h-72 left-2/4 top-2/4 rounded-lg z-50 -translate-x-1/2 -translate-y-1/2">
         <div className="ml-10 font-semibold mt-6 mb-3"> Add Bookmark
         </div>
         <div className="ml-10 mb-8">
@@ -174,6 +164,7 @@ function LinkPopup({setLinkPopupOpen, curId, files}) {
         </div>
       </div>
     </div>
+    
   )
 }
 
@@ -199,8 +190,8 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
 
   return (
     <div className="flex h-10 mt-1 mb-3 items-center">
-      <img src={require('./img/chromeIcon.png')} className="h-7 w-7 mx-4"></img>
-      <div className="font-semibold text-lg font-mono">
+      <img src={require('./img/chromeIcon.png')} className="h-6 w-6 mx-4"></img>
+      <div className=" text-2xl font-sans font-semibold">
         Bookmarks
       </div>
       <div className="border-gray-300 rounded-3xl flex flex-1 ml-8 z-10 h-full bg-gray-100 
@@ -214,8 +205,8 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
         }
       </div>
-      {optionsOpen && <div className="shadow-xl border-gray-100 border-[1px] rounded-md bg-white absolute top-3 right-3 w-40 z-10 flex flex-col justify-start text-sm">
-          <div className="ml-5 mt-3">
+      {optionsOpen && <div className="shadow-2xl border-gray-100 border-[1px] rounded-md bg-white absolute top-2 right-3 w-40 z-10 flex flex-col justify-start text-sm">
+          <div className="ml-5 mt-3 my-2">
             <button onClick={newBookmark}> Add new bookmark</button> 
           </div>
           <div className="ml-5 mb-3">
@@ -241,29 +232,30 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed}) 
   }
 
   return (
-    <div className="fixed w-52 h-screen">
-        {
-          foldersBel.map( (x,ind) => {
-            return <div>
-              <div className={classNames("hover:bg-gray-200 rounded-r-full",
-              {
-                // TODO: should be taking from child if child hovered
-              'bg-blue-200': x.id===curId,
-              'hover: bg-blue-200': x.id===curId
-              }
-              )}>
-                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
-              </div>
-              { collapsed && collapsed.find(y=> y.id===x.id) && 
-                !collapsed.find(y=> y.id===x.id).isCollapsed?
-                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed}/>:
-                <div>
-                </div>
-              }
+    <div>
+      {
+        foldersBel.map( (x,ind) => {
+          return <div className="">
+            <div className={classNames("hover:bg-gray-200 rounded-r-full",
+            {
+              // TODO: should be taking from child if child hovered
+            'bg-blue-200': x.id===curId,
+            'hover: bg-blue-200': x.id===curId
+            }
+            )}>
+              <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
             </div>
-          })
-        }
-      </div>
+            { collapsed && collapsed.find(y=> y.id===x.id) && 
+              !collapsed.find(y=> y.id===x.id).isCollapsed?
+              <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed}/>:
+              <div>
+              </div>
+            }
+          </div>
+        })
+      }
+    </div>
+
   )
 }
 function File({val, curId, setCurID, collapsed, setCollapsed}) {
@@ -275,9 +267,7 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
     if(ind){
       let tmp = [...collapsed];
       let OBJ=collapsed[ind];
-      console.log(val, ind, OBJ);
       tmp[ind] = {"id":val.id, "isCollapsed":!OBJ.isCollapsed}
-      console.log("TMP", tmp);
       setCollapsed(tmp);
     }
   }
@@ -287,11 +277,10 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
     if(TMP2){
       TMP = TMP2.isCollapsed;
     }
-    console.log("TMP",TMP);
   }
   
   return <div > 
-    <div className={classNames('hover:cursor-pointer rounded-r-full h-10', 
+    <div className={classNames('hover:cursor-pointer rounded-r-full h-10 flex flex-col', 
       {
         'bg-blue-200':val.id===curId,
         'hover: bg-blue-200':val.id===curId,
