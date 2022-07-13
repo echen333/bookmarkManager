@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import File from './File'
 
-function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed}) {
+function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, depth=0}) {
     let tmp = files.find(x => x.id===dfsNode);
     let foldersBel=[]
     if(tmp){
@@ -27,11 +27,11 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed}) 
               'hover: bg-blue-200': x.id===curId
               }
               )}>
-                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}/>
+                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} myDepth={depth}/>
               </div>
               { collapsed && collapsed.find(y=> y.id===x.id) && 
                 !collapsed.find(y=> y.id===x.id).isCollapsed?
-                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed}/>:
+                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed} depth={depth+1}/>:
                 <div>
                 </div>
               }

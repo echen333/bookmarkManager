@@ -13,4 +13,5 @@ urlpatterns = [
     path('<int:my_id>/deletes/', views.deletes, name='deletes'),
     path('<int:my_id>/getBookmark/', views.getBookmark, name='getBookmark'),
     path('<int:my_id>/sorts/', views.sorts, name='sorts'),
+    path('<int:my_id>/<int:parId>/changePar/', views.changePar, name='changePar'),
 ]

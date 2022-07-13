@@ -66,7 +66,7 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
                     Name
                     </div>
                     <div>
-                    <input className="bg-gray-200 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
+                    <input className="border-pink-800 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
                     </div>
                 </div>
                 <div className="absolute bottom-0 right-0">

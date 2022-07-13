@@ -77,8 +77,8 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fet
               Name
             </div>
             <div>
-              <input className="bg-gray-200 border-b-2 border-white focus:outline-none rounded-sm pl-2 h-7 w-11/12
-              focus:mb-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
+              <input className="bg-gray-200 border-b-2 focus:outline-none rounded-sm m-0 pl-2 h-7 w-11/12
+               focus:border-blue-500 transition duration-500" value={formName} onChange={nameChange}></input>
             </div>
           </div>
           <div className="ml-10">
@@ -87,7 +87,7 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fet
             </div>
             <div>
               <input className="bg-gray-200 border-b-2 focus:outline-none rounded-sm pl-2 h-7 w-11/12
-              focus:mb-2 focus:border-blue-500 transition" value={formURL} onChange={URLChange}></input>
+               focus:border-blue-500 transition duration-500" value={formURL} onChange={URLChange}></input>
             </div>
           </div>
           <div className="absolute bottom-0 right-0">

@@ -37,7 +37,7 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
           Bookmarks
         </div>
         <div className="border-gray-300 rounded-3xl flex flex-1 ml-8 z-10 h-full bg-gray-100 
-              text-sm mx-3 items-center">
+              text-sm mx-3 items-center max-w-xl align-middle justify-center">
           <AiOutlineSearch className="h-6 w-6 hover:bg-gray-300 hover: cursor-pointer rounded-full ml-2"/>
           <input className="pl-3 focus:outline-none bg-gray-100 w-full"
             placeholder="Search bookmarks"

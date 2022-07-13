@@ -3,7 +3,7 @@ import { AiOutlineFolder,  } from 'react-icons/ai'
 import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md'
 import classNames from 'classnames';
 
-function File({val, curId, setCurID, collapsed, setCollapsed}) {
+function File({val, curId, setCurID, collapsed, setCollapsed, myDepth}) {
     const handleClick = () => {
       setCurID(val.id);
     }
@@ -29,7 +29,7 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
         {
           'bg-blue-200':val.id===curId,
           'hover: bg-blue-200':val.id===curId,
-          [`pl-${val.depth}`]: true
+          [`pl-${myDepth}`]: true
         }
       )} onClick={handleClick}>
         <div className="flex">

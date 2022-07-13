@@ -115,6 +115,7 @@ def sorts(request, my_id):
 
     sortedArr = sorted(childArr2, key=lambda x: Item.objects.get(pk=int(x)).title.lower());
     
+    # retJoin = arrTS(sortedArr)
     retJoin = "";
     for x in range(len(sortedArr)):
         if(x!=0):
@@ -124,3 +125,41 @@ def sorts(request, my_id):
     item.save()
     print(item.child_id)
     return HttpResponse("Success")
+
+def arrTS(arr):
+    retJoin = "";
+    for x in range(len(arr)):
+        if(x!=0):
+            retJoin+=","
+        retJoin+=str(arr[x])
+    return retJoin;
+
+#expects val and childs as string
+#returns string wo val
+def remVal(childs, val):
+    childArr = childs.split(',')
+    if val in childArr:
+        childArr.remove(val)
+    return arrTS(childArr)
+    
+def changePar(request, my_id, parId):
+    if Item.objects.filter(pk=parId).exists():
+        item = Item.objects.get(pk=my_id)
+        oldPar = Item.objects.get(pk=item.par_id)
+        oldPar.child_id = remVal(oldPar.child_id, str(my_id));
+        oldPar.save()
+        print("GOOD")
+        
+        item.par_id=parId;
+        item.save();
+        print("GOOD 2")
+        
+        newPar = Item.objects.get(pk=parId)
+        newPar.child_id = newPar.child_id+","+str(my_id)
+        newPar.save()
+        print("GOOD 3")
+        
+        return HttpResponse("Success")
+    return HttpResponse("Failed")
+    
+    
