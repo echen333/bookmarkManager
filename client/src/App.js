@@ -54,7 +54,7 @@ function App() {
   useEffect( () => {
     fetchAll();
   }, [])
-  
+
   useEffect( ()=> {
     if(folderPopupOpen){
       setFListening(false);

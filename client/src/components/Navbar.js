@@ -25,8 +25,9 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
       console.log("SORTED");
       fetchAll();
     }
-    const exportBookmarks = () => {
-        
+    const openHelp = () => {
+      window.open("https://support.google.com/chrome/answer/188842?visit_id=637932814270745867-3652172056&p=bookmarks&rd=1")
+      setOptionsOpen(false)
     }
   
     return (
@@ -49,21 +50,24 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
         {optionsOpen && 
           <div className="shadow-2xl border-gray-100 border-[1px] rounded-md bg-white absolute top-2 right-3 w-40 z-10 flex flex-col justify-start text-sm">
   
-            <div className="ml-5 mt-3 my-1">
+            <div className="pl-5 mt-2 py-1.5 hover:bg-gray-300">
               <button onClick={sortChildren}> Sort by name</button> 
             </div>
-            <div className="ml-5 my-1">
+            <div className="pl-5 py-1.5 hover:bg-gray-300">
               <button onClick={newBookmark}> Add new bookmark</button> 
             </div>
-            <div className="ml-5 my-1">
+            <div className="pl-5 py-1.5 hover:bg-gray-300">
               <button onClick={newFolder}> Add new folder</button> 
             </div>
-            <div className="ml-5 mb-3 my-1">
+            <div className="pl-5 py-1.5 hover:bg-gray-300">
                 <a
             href={require('../utils/bookmarks_7_12_22.txt')}
             download
             >Export Bookmarks</a>
               {/* <button onClick={exportBookmarks}> Export Bookmarks</button>  */}
+            </div>
+            <div className="pl-5 mb-2 py-1.5 hover:bg-gray-300">
+              <button onClick={openHelp}> Help Center</button> 
             </div>
           </div> 
         }

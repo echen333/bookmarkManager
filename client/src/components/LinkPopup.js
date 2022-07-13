@@ -9,6 +9,10 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fet
     const menuRef = useRef(null);
   
     const SaveButton = async () => {
+      if(formURL.length===0 || formName.length===0){
+        console.log("EMPTY", formName, formURL);
+        // return;
+      }
       setLinkPopupOpen(false);
       var bodyFormData = new FormData();
       let tmp = formURL;
@@ -35,6 +39,24 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fet
     const URLChange = (e) => {
       setFormURL(e.target.value);
     }
+    useEffect( () => {
+      const handleType = (event) => {
+        if (event.key === 'Enter'){
+          SaveButton();
+          return;
+        }
+        if (event.key === 'Escape'){
+          CancelButton();
+          return;
+        }
+        return;
+      }
+      window.addEventListener('keyup', handleType)
+  
+      return () => {
+        window.removeEventListener('keyup', handleType)
+      }
+  }, []);
   
     useEffect(listenForOutsideClicks(
       listening,

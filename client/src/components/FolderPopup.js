@@ -9,20 +9,42 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
     const menuRef = useRef(null);
 
     const SaveButton = async () => {
-      setFolderPopupOpen(false);
-      var bodyFormData = new FormData();
-      bodyFormData.append('title', formName);
-      bodyFormData.append('par_id', curId);
-      const ret = await axios.post('/polls/addFolder/', bodyFormData);
-      // TODO: setFiles( files => [...files, obj])
-      fetchAll();
+        if(formName.length===0){
+            console.log("EMPTY TITLE");
+            // return;
+        }
+        setFolderPopupOpen(false);
+        var bodyFormData = new FormData();
+        bodyFormData.append('title', formName);
+        bodyFormData.append('par_id', curId);
+        const ret = await axios.post('/polls/addFolder/', bodyFormData);
+        // TODO: setFiles( files => [...files, obj])
+        fetchAll();
     }
     const CancelButton = () => {
-      setFolderPopupOpen(false);
+        setFolderPopupOpen(false);
     }
     const nameChange = (e) => {
-      setFormName(e.target.value);
+        setFormName(e.target.value);
     }
+    useEffect( () => {
+        const handleType = (event) => {
+          if (event.key === 'Enter'){
+            SaveButton();
+            return;
+          }
+          if (event.key === 'Escape'){
+            CancelButton();
+            return;
+          }
+          return;
+        }
+        window.addEventListener('keyup', handleType)
+    
+        return () => {
+          window.removeEventListener('keyup', handleType)
+        }
+    }, []);
 
     useEffect(listenForOutsideClick(
         Flistening,

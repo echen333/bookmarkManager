@@ -87,22 +87,25 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
             :<img src="http://google.com/favicon.ico" className="w-6 h-6 mr-4" />
         }
         {tmp.title}
+        {parseInt(cardID) === focusedCard && <div className="ml-4 text-gray-500">
+          {tmp.link}
+          </div>}
         <div className="absolute right-4 mt-1">
           <div onClick={handleOptionsClick} className="hover:bg-gray-200 absolute right-4 mt-1 rounded-full">
             <BsThreeDotsVertical />
           </div>
           { cardOptionsOpen && cardID===cardOptionsID && 
-            <div ref={menuRef} className="shadow-xl border-gray-100 border-[1px] bg-white rounded-md relative top-0 right-3 w-44 z-10 flex flex-col justify-start text-sm">
-              <div className="ml-5 my-3">
+            <div ref={menuRef} className="shadow-xl border-gray-100 border-[1px] bg-white rounded-sm relative top-0 right-3 w-44 z-10 flex flex-col justify-start text-sm overflow-hidden">
+              <div className="pl-5 mt-1 py-1.5 hover:bg-gray-300">
                 <button onClick={handleOpenNewTabClick}> Open in New Tab</button> 
               </div>
-              <div className="ml-5 mb-3">
+              <div className="pl-5 py-1.5 hover:bg-gray-300" >
                 <button onClick={handleOpenNewWindowClick}> Open in New Window</button> 
               </div>
-              <div className="ml-5 mb-3">
+              <div className="pl-5 py-1.5 hover:bg-gray-300">
                 <button onClick={handleEditBookmarkClick}>Edit Bookmark</button> 
               </div>
-              <div className="ml-5 mb-3">
+              <div className="pl-5 mb-1 py-1.5 hover:bg-gray-300">
                 <button onClick={handleDeleteBookmarkClick}>Delete Bookmark</button> 
               </div>
           </div> 
