@@ -20,6 +20,7 @@ properties of a file
  - link if bookmark
 */
 
+
 function App() {
 
   const [files, setFiles] = useState([]);
@@ -31,24 +32,23 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [Flistening, setFListening] = useState(false);
   const [Llistening, setLListening] = useState(false);
+  
+  async function fetchAll() {
+    const ret = await axios.get('/polls/getAll');
+    console.log(ret);
+    setFiles(ret.data)
+    
+    let tmpCollapsed = [];
+      ret.data.forEach( x => {
+        if(x.type==="Folder" && !collapsed.find(y => y.id===x.id)){
+          tmpCollapsed.push({"id":x.id, "isCollapsed": false});
+        }
+      })
+    setCollapsed(tmpCollapsed);
+  }
 
   useEffect( () => {
-    async function fetchAll() {
-      const ret = await axios.get('/polls/getAll');
-      console.log(ret);
-      setFiles(ret.data)
-      
-      let tmpCollapsed = [];
-        ret.data.forEach( x => {
-          if(x.type==="Folder" && !collapsed.find(y => y.id===x.id)){
-            tmpCollapsed.push({"id":x.id, "isCollapsed": false});
-          }
-        })
-      setCollapsed(tmpCollapsed);
-    }
     fetchAll();
-    
-    
   }, [])
   
   useEffect( ()=> {
@@ -71,12 +71,12 @@ function App() {
       
       {
         folderPopupOpen && <FolderPopup setFolderPopupOpen={setFolderPopupOpen} curId={curId} setFiles={setFiles} files={files}
-        Flistening={Flistening} setFListening={setFListening}/>
+        Flistening={Flistening} setFListening={setFListening} fetchAll={fetchAll}/>
         // Flistening kinda redundant cuz is just folderPopupOpen
       }
       {
         linkPopupOpen && <LinkPopup setLinkPopupOpen={setLinkPopupOpen} curId={curId} setFiles={setFiles}
-        listening={Llistening} setListening={setLListening}
+        listening={Llistening} setListening={setLListening} fetchAll={fetchAll}
         // listening={!linkPopupOpen} setListening={setLinkPopupOpen} this part doesn't seem too work bc too fast and registers click already?
         />
       }
@@ -87,14 +87,14 @@ function App() {
       
       <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 overflow-hidden">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
-        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+        searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
         />
       </div>
     </div>
   );
 }
 
-function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening}) {
+function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening, fetchAll}) {
     
   const [formName, setFormName] = useState("");
   const [formURL, setFormURL] = useState("");
@@ -115,6 +115,7 @@ function LinkPopup({setLinkPopupOpen, curId, files, listening, setListening}) {
       console.log(key[0] + ', ' + key[1]);
     }
     const ret = await axios.post('/polls/addLink/', bodyFormData);
+    fetchAll();
     console.log(ret);
   }
   const CancelButton = () => {
@@ -307,7 +308,7 @@ function File({val, curId, setCurID, collapsed, setCollapsed}) {
   </div>
 }
 
-function Viewport({content,files, setCurID, searchQuery, setSearchQuery}){
+function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAll}){
 
   const [focusedCard, setCardFocus] = useState(-1);
   const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
@@ -330,20 +331,22 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery}){
       if(x.title.includes(searchQuery) || x.link.includes(searchQuery)){
         Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
           setCardFocus={setCardFocus} focusedCard={focusedCard}
-          cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}/>)
+          cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
+          fetchAll={fetchAll}/>)
       }
     })
   } else {
     childArr.map( (ID, ind) => {
       Cards.push( <Card cardID={ID} files={files} setCurID={setCurID} 
         setCardFocus={setCardFocus} focusedCard={focusedCard}
-        cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}/>)
+        cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
+        fetchAll={fetchAll}/>)
     })
   }
   return Cards;
 }
 
-function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen}){
+function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll}){
 
   const menuRef = useRef(null);
   const [cardListening, setCardListening] = useState(false);
@@ -368,7 +371,10 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
     window.open(files.find(x => x.id===parseInt(cardID)).link);
   }
   const handleDeleteBookmarkClick = async () => {
-    // await axios.delete('/')
+    console.log("DELETING", cardID);
+    await axios.get(`/polls/${cardID}/deletes/`)
+    fetchAll();
+    console.log("DONE FETCHING");
   }
   const handleEditBookmarkClick = () => {
   }
@@ -398,6 +404,9 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
     return <div/>
   }
   let tmp = files.find( x => x.id === parsed)
+  if(!tmp){
+    return <div/>
+  }
   let imgStr = tmp.link+"/favicon.ico"
   let imgFound = true;
   // try {

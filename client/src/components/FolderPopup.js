@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'
 import listenForOutsideClick from "../utils/listenForOutsideClicks";
 
-function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, setFListening}) {
+function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, setFListening, fetchAll}) {
     
     const [formName, setFormName] = useState("");
     const menuRef = useRef(null);
@@ -15,6 +15,7 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
       bodyFormData.append('par_id', curId);
       const ret = await axios.post('/polls/addFolder/', bodyFormData);
       // TODO: setFiles( files => [...files, obj])
+      fetchAll();
     }
     const CancelButton = () => {
       setFolderPopupOpen(false);
