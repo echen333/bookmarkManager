@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AiOutlineFolder,  } from 'react-icons/ai'
 import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md'
 import classNames from 'classnames';
+import axios from 'axios'
 
-function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel}) {
+function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, fetchAll, curIdDragging}) {
+
+    const [draggedOver, setDraggedOver] = useState(false);
+    const dragOver = (e) => {
+      e.preventDefault();
+      setDraggedOver(true);
+    }
+    const dragLeave = () => {
+      setDraggedOver(false);
+    }
+    const handleDrop = async (e) => {
+      setDraggedOver(false);
+      e.preventDefault();
+      console.log(curIdDragging, "DROPPED", val.id);//need the cardID for which dropped
+      await axios.get(`/polls/${curIdDragging}/${val.id}/changePar`)
+      fetchAll();
+    }
+
     const handleClick = () => {
       setCurID(val.id);
     }
@@ -23,16 +41,16 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel}) 
         TMP = TMP2.isCollapsed;
       }
     }
-    console.log(numBel>0, val.id, numBel);
+    // console.log(numBel>0, val.id, numBel);
     
     return <div > 
       <div className={classNames('hover:cursor-pointer rounded-r-full h-10 flex flex-col', 
         {
-          'bg-blue-200':val.id===curId,
+          'bg-blue-200':val.id===curId || draggedOver,
           'hover: bg-blue-200':val.id===curId,
           [`pl-${3*myDepth}`]: true
         }
-      )} onClick={handleClick}>
+      )} onClick={handleClick} onDragOver={dragOver} onDragLeave={dragLeave} onDrop={handleDrop}>
         <div className="flex">
           {val.type === "Folder" && 
               <div className="flex mt-2 mr-2">

@@ -36,6 +36,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [Flistening, setFListening] = useState(false);
   const [Llistening, setLListening] = useState(false);
+  const [curIdDragging, setCurIdDragging] = useState(-1);
   
   async function fetchAll() {
     const ret = await axios.get('/polls/getAll');
@@ -86,13 +87,16 @@ function App() {
       }
       
       <div className="fixed min-w-fit h-screen resize cursor-e-resize">
-        <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} fetchAll={fetchAll}/>
+        <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} fetchAll={fetchAll}
+        curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+        />
       </div>
       
       {/* <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 max-w-5xl"> */}
       <div className="flex flex-col ml-60 w-screen absolute justify-center align-middle shadow-xl border-[1px] border-gray-200 max-w-5xl">
         <Viewport content={files.find( x => x.id === curId)} files={files} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
         searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
+        curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
         />
       </div>
     </div>

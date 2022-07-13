@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import File from './File'
 
-function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, depth=0, fetchAll}) {
+function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, depth=0, curIdDragging, setCurIdDragging, fetchAll}) {
     const [foldersBel, setFoldersBel] = useState([])
 
   useEffect( ()=> { //BUG: DOES NOT UPDATE AFTER FETCH ALL
@@ -22,7 +22,7 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, d
       }
   }, [files])
   
-    console.log(dfsNode, foldersBel.length);
+    // console.log(dfsNode, foldersBel.length);
     return (
       <div>
         {
@@ -35,11 +35,13 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, d
               'hover: bg-blue-200': x.id===curId
               }
               )}>
-                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} myDepth={depth} numBel={foldersBel.length}/>
+                <File key={ind} val={x} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} myDepth={depth} numBel={foldersBel.length}
+                curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} fetchAll={fetchAll}/>:
               </div>
               { collapsed && collapsed.find(y=> y.id===x.id) && 
                 !collapsed.find(y=> y.id===x.id).isCollapsed?
-                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed} depth={depth+1}/>:
+                <SideBar2 files={files} curId={curId} setCurID={setCurID} dfsNode={x.id} collapsed={collapsed} setCollapsed={setCollapsed} depth={depth+1}
+                curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} fetchAll={fetchAll}/>:
                 <div>
                 </div>
               }

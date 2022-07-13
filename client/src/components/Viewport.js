@@ -5,12 +5,11 @@ import classNames from 'classnames';
 import axios from 'axios'
 import listenForOutsideClicks from '../utils/listenForOutsideClicks';
 
-function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAll}){
+function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAll, curIdDragging, setCurIdDragging}){
 
     const [focusedCard, setCardFocus] = useState(-1);
     const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
     const [cardOptionsID, setCardOptionsID] = useState(-1);
-    const [curIdDragging, setCurIdDragging] = useState(-1);
     
     if(content === undefined){
       return <div></div>
