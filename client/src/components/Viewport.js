@@ -10,6 +10,7 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
     const [focusedCard, setCardFocus] = useState(-1);
     const [cardOptionsOpen, setCardOptionsOpen] = useState(false);
     const [cardOptionsID, setCardOptionsID] = useState(-1);
+    const [curIndexDragging, setCurIndexDragging] = useState(-1);
     
     if(content === undefined){
       return <div></div>
@@ -25,7 +26,9 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
           Cards.push( <Card cardID={x.id} files={files} setCurID={setCurID} 
             setCardFocus={setCardFocus} focusedCard={focusedCard}
             cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
-            fetchAll={fetchAll} ind={ind} len={childArr2.length}/>)
+            fetchAll={fetchAll} ind={ind} len={childArr2.length}
+            curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} curIndexDragging={curIndexDragging} setCurIndexDragging={setCurIndexDragging}
+            />)
         }
       })
     } else {
@@ -38,7 +41,7 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
             setCardFocus={setCardFocus} focusedCard={focusedCard}
             cardOptionsOpen={cardOptionsOpen} setCardOptionsOpen={setCardOptionsOpen} cardOptionsID={cardOptionsID} setCardOptionsID={setCardOptionsID}
             fetchAll={fetchAll} ind={ind} len={childArr2.length}
-            curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+            curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} curIndexDragging={curIndexDragging} setCurIndexDragging={setCurIndexDragging}
             />)
         })
       }
@@ -47,11 +50,13 @@ function Viewport({content,files, setCurID, searchQuery, setSearchQuery, fetchAl
     return Cards;
 }
 
-function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll, ind, len, curIdDragging, setCurIdDragging}){
+function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID, setCardOptionsID, cardOptionsOpen, setCardOptionsOpen, fetchAll, ind, len, curIdDragging, setCurIdDragging,
+              curIndexDragging, setCurIndexDragging}){
 
     const menuRef = useRef(null);
     const [cardListening, setCardListening] = useState(false);
     const [draggedOver, setDraggedOver] = useState(false);
+    const [draggedFolderOver, setDraggedFolderOver] = useState(false);
   
     const handleClick = (e) => {
       setCardFocus(parseInt(cardID));
@@ -97,18 +102,22 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
     }
     const isDragging = (e) => {
       setCurIdDragging(cardID)
+      setCurIndexDragging(ind)
       console.log("I AM BEING DRAGGED", cardID);
     }
     const dragOver = (e) => {
       e.preventDefault();
-      // if(files.find(x => x.id === parseInt(cardID)).type === "Folder"){
-        setDraggedOver(true);
-      // }
+      if(files.find(x => x.id === parseInt(cardID)).type === "Folder"){
+        setDraggedFolderOver(true);
+      }
+      setDraggedOver(true);
     }
     const dragLeave = () => {
+      setDraggedFolderOver(false);
       setDraggedOver(false);
     }
     const handleDrop = async (e) => {
+      setDraggedFolderOver(false);
       setDraggedOver(false);
       e.preventDefault();
       if(files.find(x => x.id === parseInt(cardID)).type === "Folder"){
@@ -116,6 +125,14 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
         await axios.get(`/polls/${curIdDragging}/${cardID}/changePar`)
         fetchAll();
         // console.log(e.target);
+      } else {
+        console.log(curIdDragging, "DROPPED", cardID);//need the cardID for which dropped
+        if (ind<curIndexDragging){
+          await axios.get(`/polls/${curIdDragging}/${cardID}/1/changeOrder`)
+        } else {
+          await axios.get(`/polls/${curIdDragging}/${cardID}/0/changeOrder`)
+        }
+        fetchAll();
       }
     }
 
@@ -148,9 +165,14 @@ function Card({cardID, files, setCurID, setCardFocus, focusedCard, cardOptionsID
       console.log("IS UNDEFINED");
     } else {
       return <div onClick={handleClick} onDragStart={dragStarts} onDrag={isDragging} onDragLeave={dragLeave} draggable={true} onDragOver={dragOver} onDrop={handleDrop}
-        className={classNames("cursor-pointer py-2 pl-6 flex",
+        className={classNames("cursor-pointer py-2 pl-6 flex border-y-2",
         {
-          'bg-blue-200': parseInt(cardID) === focusedCard || draggedOver,
+          'bg-blue-200': parseInt(cardID) === focusedCard || draggedFolderOver,
+          'border-blue-400': draggedOver,
+          'border-white': !draggedOver,
+          'border-t-2 border-b-white': draggedOver && ind<curIndexDragging,
+          'border-b-2 border-t-white': draggedOver && ind>curIndexDragging,
+          'border-y-white': draggedOver && (ind===curIndexDragging || draggedFolderOver) ,
           'mt-2': ind===0,
           'mb-2': ind===len-1,
         })}>

@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:my_id>/getBookmark/', views.getBookmark, name='getBookmark'),
     path('<int:my_id>/sorts/', views.sorts, name='sorts'),
     path('<int:my_id>/<int:parId>/changePar/', views.changePar, name='changePar'),
+    path('<int:my_id>/<int:fixed_id>/<int:isBef>/changeOrder/', views.changeOrder, name='changeOrder'),
 ]

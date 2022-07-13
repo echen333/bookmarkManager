@@ -162,4 +162,29 @@ def changePar(request, my_id, parId):
         return HttpResponse("Success")
     return HttpResponse("Failed")
     
-    
+def changeOrder(request, my_id, fixed_id, isBef):
+    #whole idea is j change par id children order, 
+    if Item.objects.filter(pk=my_id).exists():
+        item = Item.objects.get(pk=my_id)
+        itemPar = Item.objects.get(pk=item.par_id)
+        
+        childArr = itemPar.child_id.split(',')
+        ret = []
+        for x in childArr:
+            if x == str(my_id):
+                continue
+            elif x == str(fixed_id):
+                if isBef:
+                    ret.append(str(my_id))
+                    ret.append(x)
+                else:
+                    ret.append(x)
+                    ret.append(str(my_id))
+            else:
+                ret.append(x)
+                
+        itemPar.child_id = arrTS(ret);
+        itemPar.save();
+        return HttpResponse("Success")
+        
+    return HttpResponse("Fail")
