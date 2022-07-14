@@ -47,7 +47,7 @@ function App() {
     
     let tmpCollapsed = [];
       ret.data.forEach( x => {
-        if(x.type==="Folder" && !collapsed.find(y => y.id===x.id)){
+        if(x.type==="Folder"){
           tmpCollapsed.push({"id":x.id, "isCollapsed": false});
         }
       })
@@ -96,13 +96,15 @@ function App() {
         />
       </div>
       
-      {/* <div className="absolute left-60 rounded-xl right-10 mr-10 shadow-xl border-[1px] border-gray-200 max-w-5xl"> */}
-      <div className="flex flex-col ml-60 w-screen absolute justify-center align-middle shadow-xl border-[1px] border-gray-200 max-w-5xl">
-        <Viewport content={files.find( x => x.id === curId)} files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
-        searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
-        curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
-        msg={msg} setAlertMsg={setAlertMsg}
-        />
+      <div className="flex justify-center align-middle ml-72 "> 
+          {/* mr-24 */}
+        <div className="flex flex-col flex-1 max-w-4xl w-screen absolute shadow-xl border-[1px] border-gray-200">
+          <Viewport content={files.find( x => x.id === curId)} files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
+          searchQuery={searchQuery} setSearchQuery={setSearchQuery} fetchAll={fetchAll}
+          curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+          msg={msg} setAlertMsg={setAlertMsg}
+          />
+        </div>
       </div>
     </div>
   );

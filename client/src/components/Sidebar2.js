@@ -6,7 +6,6 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, d
     const [foldersBel, setFoldersBel] = useState([])
 
   useEffect( ()=> { //BUG: DOES NOT UPDATE AFTER FETCH ALL
-    // console.log("UPDATED SIDEBAR 2");
       let tmp = files.find(x => x.id===dfsNode);
       let tmpFolders = [];
       if(tmp){
@@ -18,9 +17,8 @@ function SideBar2({files, curId, setCurID, dfsNode=1, collapsed, setCollapsed, d
           }
         })
         setFoldersBel(tmpFolders);
-        // console.log("BEL", tmpFolders, childArr);
       }
-  }, [files])
+  }, [files, fetchAll])
   
     // console.log(dfsNode, foldersBel.length);
     return (

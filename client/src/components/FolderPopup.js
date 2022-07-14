@@ -8,7 +8,7 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
     const [formName, setFormName] = useState("");
     const menuRef = useRef(null);
 
-    const SaveButton = async () => {
+    const SaveButton = async (e) => {
         if(formName.length===0){
             console.log("EMPTY TITLE");
             // return;
@@ -18,7 +18,6 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
         bodyFormData.append('title', formName);
         bodyFormData.append('par_id', curId);
         const ret = await axios.post('/polls/addFolder/', bodyFormData);
-        // TODO: setFiles( files => [...files, obj])
         fetchAll();
     }
     const CancelButton = () => {
@@ -66,7 +65,7 @@ function FolderPopup({setFolderPopupOpen, curId, setFiles, files, Flistening, se
                     Name
                     </div>
                     <div>
-                    <input className="border-pink-800 border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
+                    <input className="border-0 focus:outline-none rounded-sm pl-2 h-7 w-11/12 focus:mb-2 border-b-2 focus:border-blue-500 transition" value={formName} onChange={nameChange}></input>
                     </div>
                 </div>
                 <div className="absolute bottom-0 right-0">

@@ -33,17 +33,17 @@ function NavBar({optionsOpen, setOptionsOpen, setFolderPopupOpen, setLinkPopupOp
     return (
       <div className="flex h-10 mt-1 mb-3 items-center">
         <img src={require('../img/chromeIcon.png')} alt="Chrome Icon" className="h-6 w-6 mx-4"></img>
-        <div className=" text-2xl font-sans font-semibold">
+        <div className=" text-2xl font-sans font-semibold flex-1">
           Bookmarks
         </div>
-        <div className="border-gray-300 rounded-3xl flex flex-1 ml-8 z-10 h-full bg-gray-100 
-              text-sm mx-3 items-center max-w-xl align-middle justify-center">
+        <div className="border-gray-300 rounded-3xl flex flex-1 z-10 h-full bg-gray-100
+              text-sm items-center align-middle max-w-xl justify-center shrink-0 grow-0">
           <AiOutlineSearch className="h-6 w-6 hover:bg-gray-300 hover: cursor-pointer rounded-full ml-2"/>
-          <input className="pl-3 focus:outline-none bg-gray-100 w-full"
+          <input className="pl-3 focus:outline-none bg-gray-100 shrink-0 grow-0"
             placeholder="Search bookmarks"
             type="search" onChange={searchChange} value={searchQuery}/>
         </div>
-        <div className="h-8 w-8 mx-3 hover:bg-gray-300 rounded-full" onClick={optionsClicked} onBlur={optionsFocusedOut}>
+        <div className="h-8 w-8 mx-3 flex-1 hover:bg-gray-300 rounded-full" onClick={optionsClicked} onBlur={optionsFocusedOut}>
           {!optionsOpen && <BsThreeDotsVertical className="hover:cursor-pointer h-4 w-4 top-4 right-5 absolute mx-auto" onBlur={optionsFocusedOut}/>
           }
         </div>

@@ -109,6 +109,9 @@ function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptio
     const [draggedFolderOver, setDraggedFolderOver] = useState(false);
   
     const handleClick = (e) => {
+      if(cardOptionsOpen){
+        return;
+      }
       if (ctrlDown) {
         if (focusedCards.includes(parseInt(cardID))){
           setFocusedCards(focusedCards.filter(x => x!== parseInt(cardID)));
@@ -130,17 +133,21 @@ function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptio
     const handleOptionsClick = () => {
       if(!cardOptionsOpen){
         setCardOptionsOpen(true);
-        setCardOptionsID(cardID);
-        console.log("HEY", cardID);
+        setCardOptionsID(parseInt(cardID));
+        console.log("HEY", parseInt(cardID));
+      } else {
+        console.log("ALREADY OPEN");
       }
     }
     const handleOpenNewTabClick = () => {
+      console.log("OPEN NEW TAB");
       window.open(files.find(x => x.id===parseInt(cardID)).link);
     }
     const handleDeleteBookmarkClick = async () => {
       console.log("DELETING", cardID);
       await axios.get(`/polls/${cardID}/deletes/`)
       fetchAll();
+      setCardOptionsOpen(false);
       console.log("DONE FETCHING");
     }
     const handleEditBookmarkClick = () => {
@@ -204,8 +211,7 @@ function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptio
       setCardOptionsOpen,
     ));
     useEffect( () => {
-      if(cardOptionsOpen && cardOptionsID===cardID){
-        console.log("IM LISTENING", cardID);
+      if(cardOptionsOpen && cardOptionsID===parseInt(cardID)){
         setCardListening(false)
       } else {
         setCardListening(true)
@@ -251,7 +257,7 @@ function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptio
           <div onClick={handleOptionsClick} className="hover:bg-gray-200 absolute right-4 mt-1 rounded-full">
             <BsThreeDotsVertical />
           </div>
-          { cardOptionsOpen && cardID===cardOptionsID && 
+          { cardOptionsOpen && parseInt(cardID)===cardOptionsID && 
             <div ref={menuRef} className="shadow-xl border-gray-100 border-[1px] bg-white rounded-sm relative top-0 right-3 w-44 z-10 flex flex-col justify-start text-sm overflow-hidden">
               <div className="pl-5 mt-1 py-1.5 hover:bg-gray-300">
                 <button onClick={handleOpenNewTabClick}> Open in New Tab</button> 

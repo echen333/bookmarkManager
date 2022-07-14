@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineFolder,  } from 'react-icons/ai'
 import { MdOutlineKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md'
 import classNames from 'classnames';
@@ -7,6 +7,8 @@ import axios from 'axios'
 function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, fetchAll, curIdDragging}) {
 
     const [draggedOver, setDraggedOver] = useState(false);
+    const [TMP, setTMP] = useState(false);
+
     const dragOver = (e) => {
       e.preventDefault();
       setDraggedOver(true);
@@ -30,17 +32,20 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, f
       if(ind){
         let tmp = [...collapsed];
         let OBJ=collapsed[ind];
+        console.log(val.id, OBJ, collapsed);
         tmp[ind] = {"id":val.id, "isCollapsed":!OBJ.isCollapsed}
         setCollapsed(tmp);
       }
     }
-    let TMP=false;
-    if(collapsed){
-      let TMP2=collapsed.find(x => x.id===val.id)
-      if(TMP2){
-        TMP = TMP2.isCollapsed;
+
+    useEffect( () => {
+      if(collapsed){
+        let TMP2=collapsed.find(x => x.id===val.id)
+        if(TMP2){
+          setTMP(TMP2.isCollapsed);
+        }
       }
-    }
+    }, [collapsed])
     // console.log(numBel>0, val.id, numBel);
     
     return <div > 
