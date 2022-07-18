@@ -17,17 +17,18 @@ function Viewport({content,files,curId, setCurID, searchQuery, setSearchQuery, f
     useEffect( () => {
       const handleType = async (event) => {
         if (event.keyCode ===67 && event.ctrlKey) {
+          console.log("FOCUSED: ", focusedCards);
           setClipboardIDs(focusedCards);
-          if(focusedCards.length >=2){
-            setAlertMsg(`${focusedCards.length} items copied`);
-          } else if (focusedCards.length === 1){
-            //UNTESTED
-            setAlertMsg(`${focusedCards.length} itemsd copied`);
-            // setAlertMsg(files.find(x => x.id === focusedCards[0]).title +" copied")
-          } else {
-            setAlertMsg("NONE")
-          }
-          setTimeout(setAlertMsg(""), 5000)
+          // if(focusedCards.length >=2){
+          //   setAlertMsg(`${focusedCards.length} items copied`);
+          // } else if (focusedCards.length === 1){
+          //   //UNTESTEDx
+          //   setAlertMsg(`${focusedCards.length} itemsd copied`);
+          //   // setAlertMsg(files.find(x => x.id === focusedCards[0]).title +" copied")
+          // } else {
+          //   setAlertMsg("NONE")
+          // }
+          // setTimeout(setAlertMsg(""), 5000)
           console.log("COPIED!", focusedCards, focusedCards.length, focusedCards.length>0);
         }
         if (event.keyCode ===86 && event.ctrlKey) {
@@ -114,11 +115,14 @@ function Card({cardID, files, setCurID, setFocusedCards, focusedCards, cardOptio
       }
       if (ctrlDown) {
         if (focusedCards.includes(parseInt(cardID))){
+          console.log("HI 2", focusedCards);
           setFocusedCards(focusedCards.filter(x => x!== parseInt(cardID)));
         } else {
+          console.log("HI 1",  focusedCards);
           setFocusedCards([...focusedCards, parseInt(cardID)]);
         }
       } else {
+        console.log("HI 3");
         setFocusedCards([parseInt(cardID)]);
       }
       if(e.detail>=2){

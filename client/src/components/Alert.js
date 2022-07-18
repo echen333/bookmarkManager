@@ -1,6 +1,6 @@
 
 function Alert({msg, setAlertMsg}){
-    console.log("MSG", msg);
+    // console.log("MSG", msg);
     return (
         <div>
             {msg.length>0 && 

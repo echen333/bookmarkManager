@@ -96,7 +96,7 @@ function App() {
         />
       </div>
       
-      <div className="flex justify-center align-middle ml-72 "> 
+      <div className="absolute left-72 right-24"> 
           {/* mr-24 */}
         <div className="flex flex-col flex-1 max-w-4xl w-screen absolute shadow-xl border-[1px] border-gray-200">
           <Viewport content={files.find( x => x.id === curId)} files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed}
