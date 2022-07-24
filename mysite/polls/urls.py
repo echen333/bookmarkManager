@@ -11,6 +11,7 @@ urlpatterns = [
     path('getAll/', views.getAll, name='getAll'),
     path('addFolder/', views.addFolder, name='addFolder'),
     path('pasteItems/', views.pasteItems, name='pasteItems'),
+    path('makeMain/', views.makeMain, name='makeMain'),
     path('<int:my_id>/deletes/', views.deletes, name='deletes'),
     path('<int:my_id>/getBookmark/', views.getBookmark, name='getBookmark'),
     path('<int:my_id>/sorts/', views.sorts, name='sorts'),

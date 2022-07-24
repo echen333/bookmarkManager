@@ -48,8 +48,9 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, f
     }, [collapsed])
     // console.log(numBel>0, val.id, numBel);
     
-    return <div > 
-      <div className={classNames('hover:cursor-pointer rounded-r-full h-10 flex flex-col', 
+    console.log("File", val, myDepth);
+    
+    return <div className={classNames('hover:cursor-pointer rounded-r-full flex flex-col bg-pink-200 m-0 p-0', 
         {
           'bg-blue-200':val.id===curId || draggedOver,
           'hover: bg-blue-200':val.id===curId,
@@ -75,7 +76,6 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, f
           </div>
         </div>
       </div>
-    </div>
   }
 
   export default File;

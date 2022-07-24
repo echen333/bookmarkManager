@@ -29,7 +29,7 @@ properties of a file
 function App() {
 
   const [files, setFiles] = useState([]);
-  const [curId, setCurID] = useState(1);
+  const [curId, setCurID] = useState(-1);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [folderPopupOpen, setFolderPopupOpen] = useState(false);

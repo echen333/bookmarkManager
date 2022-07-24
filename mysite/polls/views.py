@@ -43,6 +43,17 @@ def getBookmark(request, my_id):
     print(serialized_obj.data)
     return JsonResponse(serialized_obj.data);
     
+def makeMain(request):
+    mainFolder = Item.objects.create(
+        title="Bookmarks bar",
+        type="Folder",
+        depth=0,
+        id=-1,
+        par_id=-2,
+    )
+    return HttpResponse("success")
+
+    
 @csrf_exempt
 def addLink(request):
     print("HAKLSDJLKASJDLKJASLDJsa");
