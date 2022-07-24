@@ -92,7 +92,7 @@ function App() {
       
       <div className="fixed min-w-fit h-screen resize cursor-e-resize">
         <SideBar2 files={files} curId={curId} setCurID={setCurID} collapsed={collapsed} setCollapsed={setCollapsed} fetchAll={fetchAll}
-        curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging}
+        curIdDragging={curIdDragging} setCurIdDragging={setCurIdDragging} depth={0}
         />
       </div>
       

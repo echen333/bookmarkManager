@@ -47,10 +47,10 @@ function File({val, curId, setCurID, collapsed, setCollapsed, myDepth, numBel, f
       }
     }, [collapsed])
     // console.log(numBel>0, val.id, numBel);
+
+    // console.log("File", val, myDepth, `pl-${3*myDepth}`);
     
-    console.log("File", val, myDepth);
-    
-    return <div className={classNames('hover:cursor-pointer rounded-r-full flex flex-col bg-pink-200 m-0 p-0', 
+    return <div className={classNames('hover:cursor-pointer rounded-r-full flex flex-col', 
         {
           'bg-blue-200':val.id===curId || draggedOver,
           'hover: bg-blue-200':val.id===curId,
